@@ -3,401 +3,1123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estimate Calculator — Domus Interior Contracting</title>
+<title>Domus Estimate Calculator V2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js" defer></script>
 <style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
 :root {
-  --bg: #f8f9fa;
+  /* Neutrals */
+  --gray-25: #fcfcfd;
+  --gray-50: #f9fafb;
+  --gray-100: #f2f4f7;
+  --gray-200: #eaecf0;
+  --gray-300: #d0d5dd;
+  --gray-400: #98a2b3;
+  --gray-500: #667085;
+  --gray-600: #475467;
+  --gray-700: #344054;
+  --gray-800: #1d2939;
+  --gray-900: #101828;
+  --gray-950: #0c111d;
+
+  /* Primary */
+  --primary-25: #f5f8ff;
+  --primary-50: #eff4ff;
+  --primary-100: #d1e0ff;
+  --primary-200: #b2ccff;
+  --primary-300: #84adff;
+  --primary-400: #528bff;
+  --primary-500: #2970ff;
+  --primary-600: #155eef;
+  --primary-700: #004eeb;
+  --primary-800: #0040c1;
+  --primary-900: #00359e;
+
+  /* Success */
+  --success-50: #ecfdf3;
+  --success-100: #d1fadf;
+  --success-500: #12b76a;
+  --success-600: #039855;
+  --success-700: #027a48;
+
+  /* Warning */
+  --warning-50: #fffaeb;
+  --warning-100: #fef0c7;
+  --warning-500: #f79009;
+  --warning-600: #dc6803;
+
+  /* Error */
+  --error-25: #fffbfa;
+  --error-50: #fef3f2;
+  --error-100: #fee4e2;
+  --error-500: #f04438;
+  --error-600: #d92d20;
+  --error-700: #b42318;
+
+  /* Surfaces */
+  --bg: var(--gray-50);
   --surface: #ffffff;
-  --border: #e2e5e9;
-  --border-light: #f0f1f3;
-  --text: #1a1d21;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-light: #eff6ff;
-  --danger: #dc2626;
-  --danger-light: #fef2f2;
-  --success: #059669;
-  --success-light: #ecfdf5;
-  --warning: #d97706;
-  --warning-light: #fffbeb;
-  --radius: 8px;
+  --surface-secondary: var(--gray-25);
+  --border: var(--gray-200);
+  --border-light: var(--gray-100);
+  --text: var(--gray-900);
+  --text-secondary: var(--gray-600);
+  --text-tertiary: var(--gray-500);
+  --text-muted: var(--gray-400);
+  --text-placeholder: var(--gray-300);
+
+  /* Radii */
+  --radius-xs: 4px;
   --radius-sm: 6px;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
-  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --radius: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(16,24,40,0.05);
+  --shadow-sm: 0 1px 3px rgba(16,24,40,0.1), 0 1px 2px rgba(16,24,40,0.06);
+  --shadow-md: 0 4px 8px -2px rgba(16,24,40,0.1), 0 2px 4px -2px rgba(16,24,40,0.06);
+  --shadow-lg: 0 12px 16px -4px rgba(16,24,40,0.08), 0 4px 6px -2px rgba(16,24,40,0.03);
+  --shadow-xl: 0 20px 24px -4px rgba(16,24,40,0.08), 0 8px 8px -4px rgba(16,24,40,0.03);
+  --shadow-focus: 0 0 0 4px rgba(41,112,255,0.24);
+  --shadow-focus-error: 0 0 0 4px rgba(240,68,56,0.24);
+
+  /* Fonts */
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+  /* Spacing scale (golden-ratio inspired) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+  --sp-8: 40px;
+  --sp-9: 48px;
+  --sp-10: 64px;
+
+  /* Transitions */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration: 150ms;
+  --duration-md: 200ms;
+  --duration-lg: 300ms;
 }
+
+/* Dark mode tokens */
+[data-theme="dark"] {
+  --bg: #0a0a0b;
+  --surface: #141416;
+  --surface-secondary: #1a1a1e;
+  --border: #2a2a2e;
+  --border-light: #1e1e22;
+  --text: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-tertiary: #7c7c82;
+  --text-muted: #56565c;
+  --text-placeholder: #3a3a3e;
+  --gray-50: #141416;
+  --gray-100: #1a1a1e;
+  --gray-200: #2a2a2e;
+  --gray-300: #3a3a3e;
+  --primary-25: #0d1530;
+  --primary-50: #111d45;
+  --primary-100: #15285e;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 16px rgba(0,0,0,0.4);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 14px; }
-body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; }
-input, select, button, textarea { font-family: inherit; font-size: inherit; }
+html { font-size: 14px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; overflow-x: hidden; }
+input, select, button, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 input[type="number"] { -moz-appearance: textfield; }
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+::selection { background: var(--primary-100); color: var(--primary-800); }
 
-/* Layout */
-.app-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.app-header h1 { font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-.app-header h1 svg { width: 22px; height: 22px; color: var(--primary); }
-.header-actions { display: flex; gap: 8px; align-items: center; }
-.container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: var(--gray-700); }
 
-/* Tabs */
-.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; }
-.tab { padding: 10px 20px; cursor: pointer; font-weight: 500; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: all 0.15s; user-select: none; }
-.tab:hover { color: var(--text); background: var(--bg); }
-.tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app-layout { display: flex; min-height: 100vh; }
 
-/* Cards */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
-.card-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+/* Sidebar */
+.sidebar {
+  width: 260px; min-width: 260px; background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200;
+  transition: transform var(--duration-lg) var(--ease);
+}
+.sidebar.collapsed { transform: translateX(-260px); }
+.sidebar-header { padding: var(--sp-5) var(--sp-5) var(--sp-4); border-bottom: 1px solid var(--border); }
+.sidebar-logo { display: flex; align-items: center; gap: var(--sp-3); }
+.sidebar-logo svg { width: 28px; height: 28px; color: var(--primary-500); flex-shrink: 0; }
+.sidebar-logo h1 { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+.sidebar-logo span { font-size: 0.7rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.02em; }
+
+.sidebar-nav { flex: 1; padding: var(--sp-3) var(--sp-3); overflow-y: auto; }
+.nav-section { margin-bottom: var(--sp-5); }
+.nav-section-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: var(--sp-2) var(--sp-3); margin-bottom: var(--sp-1); }
+.nav-item {
+  display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 0.875rem; font-weight: 500;
+  color: var(--text-secondary); transition: all var(--duration) var(--ease); user-select: none;
+}
+.nav-item:hover { background: var(--gray-100); color: var(--text); }
+.nav-item.active { background: var(--primary-50); color: var(--primary-600); }
+.nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+.nav-item .badge {
+  margin-left: auto; font-size: 0.7rem; font-weight: 600; background: var(--gray-100);
+  color: var(--text-tertiary); padding: 1px 7px; border-radius: 10px;
+}
+.nav-item.active .badge { background: var(--primary-100); color: var(--primary-600); }
+
+.sidebar-footer { padding: var(--sp-3) var(--sp-4); border-top: 1px solid var(--border); }
+.sidebar-role {
+  display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-1);
+  font-size: 0.8rem; color: var(--text-secondary);
+}
+.role-badge {
+  font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 2px 8px; border-radius: 10px; background: var(--primary-50); color: var(--primary-600);
+}
+.role-badge.viewer { background: var(--gray-100); color: var(--gray-600); }
+.role-badge.estimator { background: var(--success-50); color: var(--success-700); }
+.role-badge.admin { background: var(--primary-50); color: var(--primary-700); }
+
+/* Main content */
+.main-content {
+  flex: 1; margin-left: 260px; transition: margin-left var(--duration-lg) var(--ease);
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+.sidebar.collapsed + .main-content { margin-left: 0; }
+
+/* Top bar */
+.topbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: var(--sp-3) var(--sp-6); display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); background: rgba(255,255,255,0.85);
+}
+[data-theme="dark"] .topbar { background: rgba(20,20,22,0.85); }
+.topbar-left { display: flex; align-items: center; gap: var(--sp-4); }
+.topbar-breadcrumb { display: flex; align-items: center; gap: var(--sp-2); font-size: 0.85rem; color: var(--text-tertiary); }
+.topbar-breadcrumb span { color: var(--text); font-weight: 600; }
+.topbar-right { display: flex; align-items: center; gap: var(--sp-3); }
+
+.sidebar-toggle {
+  display: flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface);
+  cursor: pointer; color: var(--text-tertiary); transition: all var(--duration) var(--ease);
+}
+.sidebar-toggle:hover { background: var(--gray-100); color: var(--text); }
+
+.save-indicator { display: flex; align-items: center; gap: var(--sp-2); font-size: 0.75rem; color: var(--text-muted); }
+.save-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success-500); }
+.save-dot.saving { background: var(--warning-500); animation: pulse 1s ease infinite; }
+.save-dot.unsaved { background: var(--error-500); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.container { max-width: 1360px; margin: 0 auto; padding: var(--sp-6) var(--sp-7); flex: 1; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; gap: var(--sp-2); padding: 8px 14px;
+  border-radius: var(--radius-sm); font-weight: 500; font-size: 0.85rem; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary);
+  transition: all var(--duration) var(--ease); white-space: nowrap; user-select: none;
+  line-height: 1.25;
+}
+.btn:hover { background: var(--gray-50); border-color: var(--gray-300); color: var(--text); box-shadow: var(--shadow-xs); }
+.btn:active { transform: scale(0.97); }
+.btn:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.btn-primary {
+  background: var(--primary-600); color: #fff; border-color: var(--primary-600);
+  box-shadow: 0 1px 2px rgba(16,24,40,0.05);
+}
+.btn-primary:hover { background: var(--primary-700); border-color: var(--primary-700); color: #fff; }
+.btn-danger { color: var(--error-600); border-color: var(--error-200); background: var(--error-25); }
+.btn-danger:hover { background: var(--error-50); border-color: var(--error-300); color: var(--error-700); }
+.btn-success { color: var(--success-600); border-color: var(--success-100); background: var(--success-50); }
+.btn-ghost { border-color: transparent; background: transparent; color: var(--text-tertiary); }
+.btn-ghost:hover { background: var(--gray-100); color: var(--text); border-color: transparent; }
+.btn-sm { padding: 5px 10px; font-size: 0.8rem; }
+.btn-xs { padding: 3px 8px; font-size: 0.75rem; }
+.btn-icon {
+  padding: 6px; border: none; background: none; cursor: pointer; color: var(--text-muted);
+  border-radius: var(--radius-xs); transition: all var(--duration) var(--ease); display: inline-flex;
+  align-items: center; justify-content: center;
+}
+.btn-icon:hover { background: var(--gray-100); color: var(--text); }
+.btn-icon svg { width: 16px; height: 16px; }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  margin-bottom: var(--sp-5); transition: box-shadow var(--duration) var(--ease);
+}
+.card:hover { box-shadow: var(--shadow-xs); }
+.card-header {
+  padding: var(--sp-5) var(--sp-6); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title {
+  font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-tertiary); display: flex; align-items: center; gap: var(--sp-2);
+}
 .card-title svg { width: 16px; height: 16px; }
+.card-body { padding: var(--sp-6); }
+.card-body.compact { padding: var(--sp-4) var(--sp-6); }
 
-/* Form Grid */
-.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-.form-group { display: flex; flex-direction: column; gap: 4px; }
-.form-group label { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); }
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--sp-4); }
+.form-group { display: flex; flex-direction: column; gap: var(--sp-1); }
+.form-group label {
+  font-size: 0.75rem; font-weight: 500; color: var(--text-tertiary);
+  letter-spacing: 0.01em;
+}
 .form-group input, .form-group select, .form-group textarea {
-  padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-  background: var(--surface); transition: border-color 0.15s; outline: none;
+  padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); transition: all var(--duration) var(--ease); outline: none;
+  color: var(--text); font-size: 0.875rem;
 }
-.form-group input:focus, .form-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.form-group input::placeholder { color: var(--text-placeholder); }
+.form-group input:hover, .form-group select:hover { border-color: var(--gray-300); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--primary-300); box-shadow: var(--shadow-focus);
+}
 .form-group.span-2 { grid-column: span 2; }
+.form-group.span-3 { grid-column: span 3; }
+.form-hint { font-size: 0.7rem; color: var(--text-muted); font-style: italic; margin-top: var(--sp-3); }
 
-/* Buttons */
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.15s; white-space: nowrap; }
-.btn:hover { background: var(--bg); }
-.btn svg { width: 15px; height: 15px; }
-.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-.btn-primary:hover { background: var(--primary-hover); }
-.btn-danger { color: var(--danger); border-color: var(--danger); background: var(--danger-light); }
-.btn-danger:hover { background: var(--danger); color: #fff; }
-.btn-sm { padding: 4px 10px; font-size: 0.85rem; }
-.btn-icon { padding: 5px; border: none; background: none; cursor: pointer; color: var(--text-muted); border-radius: 4px; }
-.btn-icon:hover { background: var(--bg); color: var(--text); }
-
-/* BOQ Table */
+/* ============================================================
+   BOQ TABLE
+   ============================================================ */
+.boq-wrapper { overflow-x: auto; }
 .boq-table { width: 100%; border-collapse: collapse; }
-.boq-table th { background: var(--bg); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--border); position: sticky; top: 54px; z-index: 10; }
-.boq-table th.num, .boq-table td.num { text-align: right; }
-.boq-row td { padding: 6px 10px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
-.boq-row:hover { background: var(--primary-light); }
-.boq-row td input, .boq-row td select {
-  width: 100%; padding: 5px 8px; border: 1px solid transparent; border-radius: 4px;
-  background: transparent; transition: all 0.15s;
+.boq-table th {
+  background: var(--gray-50); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-tertiary); padding: 10px 12px; text-align: left;
+  border-bottom: 1px solid var(--border); position: sticky; top: 52px; z-index: 10;
+  backdrop-filter: blur(8px);
 }
-.boq-row td input:hover, .boq-row td select:hover { border-color: var(--border); background: var(--surface); }
-.boq-row td input:focus, .boq-row td select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 2px rgba(37,99,235,0.1); outline: none; }
-.boq-row td .calc-value { font-family: var(--mono); font-size: 0.9rem; color: var(--text); padding: 5px 8px; }
-.boq-row td .calc-value.total { font-weight: 600; color: var(--primary); }
+[data-theme="dark"] .boq-table th { background: rgba(20,20,22,0.9); }
+.boq-table th.num, .boq-table td.num { text-align: right; }
 
-/* Sub-item panel */
-.sub-panel { background: #fafbfc; border-bottom: 1px solid var(--border); }
-.sub-panel td { padding: 0 !important; }
-.sub-panel-inner { padding: 12px 16px 12px 48px; }
-.sub-item { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); align-items: start; }
-.sub-item:last-child { border-bottom: none; }
-.sub-item-section { display: flex; flex-direction: column; gap: 6px; }
-.sub-item-section h5 { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
-.sub-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
-.sub-field { display: flex; flex-direction: column; gap: 2px; }
-.sub-field label { font-size: 0.7rem; color: var(--text-muted); }
-.sub-field input { padding: 4px 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem; width: 100%; background: var(--surface); }
-.sub-field input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
-.sub-field .sub-total { font-family: var(--mono); font-weight: 600; font-size: 0.85rem; padding: 4px 6px; }
-.sub-item-total { font-family: var(--mono); font-weight: 600; font-size: 0.95rem; color: var(--primary); padding-top: 20px; text-align: right; min-width: 100px; }
-.sub-actions { display: flex; gap: 6px; margin-top: 8px; }
+/* Section header row */
+.section-row td {
+  padding: 10px 12px; font-weight: 700; font-size: 0.9rem; color: var(--text);
+  background: var(--gray-50); border-bottom: 1px solid var(--border); cursor: default;
+}
+[data-theme="dark"] .section-row td { background: var(--surface-secondary); }
+.section-row td:first-child { border-left: 3px solid var(--primary-500); }
+.section-row .section-subtotal { font-family: var(--mono); font-weight: 600; color: var(--primary-600); font-size: 0.85rem; }
+
+.boq-row td { padding: 4px 8px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.boq-row { transition: background var(--duration) var(--ease); }
+.boq-row:hover { background: var(--primary-25); }
+.boq-row:nth-child(even):not(:hover) { background: var(--surface-secondary); }
+.boq-row.zero-cost { background: var(--warning-50) !important; }
+.boq-row.zero-cost:hover { background: var(--warning-100) !important; }
+.boq-row.selected { background: var(--primary-50) !important; }
+
+.boq-row td input, .boq-row td select {
+  width: 100%; padding: 6px 8px; border: 1px solid transparent; border-radius: var(--radius-xs);
+  background: transparent; transition: all var(--duration) var(--ease); outline: none;
+}
+.boq-row td input:hover, .boq-row td select:hover { border-color: var(--gray-200); background: var(--surface); }
+.boq-row td input:focus, .boq-row td select:focus { border-color: var(--primary-300); background: var(--surface); box-shadow: var(--shadow-focus); }
+.calc-value { font-family: var(--mono); font-size: 0.85rem; color: var(--text-secondary); padding: 6px 8px; display: block; }
+.calc-value.total { font-weight: 600; color: var(--primary-600); }
+.calc-value.markup-badge {
+  font-size: 0.7rem; font-weight: 600; background: var(--gray-100); color: var(--text-tertiary);
+  padding: 2px 8px; border-radius: 10px; display: inline-block; text-align: center;
+}
+.line-num { font-weight: 600; color: var(--text-muted); font-size: 0.8rem; font-family: var(--mono); }
+.notes-preview { font-size: 0.7rem; color: var(--text-muted); font-style: italic; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Row actions */
+.row-actions { display: flex; gap: 2px; opacity: 0; transition: opacity var(--duration) var(--ease); }
+.boq-row:hover .row-actions { opacity: 1; }
+.row-checkbox { width: 16px; height: 16px; accent-color: var(--primary-500); cursor: pointer; }
 
 /* Expand toggle */
-.expand-toggle { cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 4px; transition: all 0.15s; }
-.expand-toggle:hover { background: var(--bg); }
-.expand-toggle svg { width: 14px; height: 14px; color: var(--text-muted); transition: transform 0.2s; }
+.expand-toggle {
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: var(--radius-xs); transition: all var(--duration) var(--ease);
+}
+.expand-toggle:hover { background: var(--gray-100); }
+.expand-toggle svg { width: 14px; height: 14px; color: var(--text-muted); transition: transform var(--duration-md) var(--ease); }
 .expand-toggle.open svg { transform: rotate(90deg); }
 
-/* Summary Card */
-.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-light); }
+/* Sub-item panel */
+.sub-panel { overflow: hidden; }
+.sub-panel td { padding: 0 !important; border-bottom: 1px solid var(--border) !important; }
+.sub-panel-inner {
+  padding: var(--sp-4) var(--sp-6) var(--sp-4) var(--sp-9);
+  background: var(--gray-50); border-top: 1px solid var(--border-light);
+  animation: slideDown var(--duration-md) var(--ease);
+}
+[data-theme="dark"] .sub-panel-inner { background: var(--surface-secondary); }
+@keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 800px; } }
+
+.sub-item {
+  display: grid; grid-template-columns: 1fr 1fr auto; gap: var(--sp-4);
+  padding: var(--sp-3) 0; border-bottom: 1px solid var(--border-light); align-items: start;
+}
+.sub-item:last-child { border-bottom: none; }
+.sub-item-section h5 {
+  font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-muted); margin-bottom: var(--sp-2);
+}
+.sub-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: var(--sp-2); }
+.sub-field { display: flex; flex-direction: column; gap: 2px; }
+.sub-field label { font-size: 0.65rem; color: var(--text-muted); font-weight: 500; }
+.sub-field input {
+  padding: 5px 7px; border: 1px solid var(--border); border-radius: var(--radius-xs);
+  font-size: 0.8rem; width: 100%; background: var(--surface); outline: none;
+  transition: all var(--duration) var(--ease);
+}
+.sub-field input:focus { border-color: var(--primary-300); box-shadow: var(--shadow-focus); }
+.sub-field .sub-total { font-family: var(--mono); font-weight: 600; font-size: 0.8rem; padding: 5px 7px; color: var(--text-secondary); }
+.sub-item-total { font-family: var(--mono); font-weight: 600; font-size: 0.9rem; color: var(--primary-600); padding-top: var(--sp-5); text-align: right; min-width: 100px; }
+.sub-actions { display: flex; gap: var(--sp-2); margin-top: var(--sp-3); align-items: center; }
+
+/* Notes inline */
+.notes-input {
+  width: 100%; padding: 5px 8px; border: 1px dashed var(--border); border-radius: var(--radius-xs);
+  background: transparent; font-size: 0.75rem; color: var(--text-tertiary); font-style: italic;
+  outline: none; transition: all var(--duration) var(--ease); margin-top: var(--sp-2);
+}
+.notes-input:focus { border-color: var(--primary-300); border-style: solid; background: var(--surface); color: var(--text); }
+
+/* ============================================================
+   SUMMARY
+   ============================================================ */
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); }
+.summary-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
 .summary-row:last-child { border-bottom: none; }
-.summary-label { font-weight: 500; color: var(--text-secondary); }
-.summary-value { font-family: var(--mono); font-weight: 600; font-size: 1rem; }
-.summary-value.highlight { color: var(--primary); font-size: 1.15rem; }
-.summary-divider { grid-column: span 2; border-top: 2px solid var(--border); margin: 4px 0; }
-.summary-grand { background: var(--primary-light); border-radius: var(--radius); padding: 16px; }
-.summary-grand .summary-value { color: var(--primary); font-size: 1.3rem; }
+.summary-label { font-weight: 500; color: var(--text-secondary); font-size: 0.875rem; }
+.summary-value { font-family: var(--mono); font-weight: 600; font-size: 0.95rem; color: var(--text); }
+.summary-value.highlight { color: var(--primary-600); }
+.summary-divider { grid-column: span 2; border-top: 2px solid var(--border); margin: var(--sp-1) 0; }
+.summary-grand {
+  background: linear-gradient(135deg, var(--primary-50), var(--primary-25)); border-radius: var(--radius-lg);
+  padding: var(--sp-5) var(--sp-6); border: 1px solid var(--primary-100);
+}
+.summary-grand .summary-value { color: var(--primary-700); font-size: 1.4rem; letter-spacing: -0.02em; }
 
-/* Settings */
-.markup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
-.markup-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); }
-.markup-item label { font-size: 0.85rem; }
-.markup-item input { width: 60px; text-align: right; padding: 3px 6px; border: 1px solid var(--border); border-radius: 4px; }
-.discount-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 6px; }
-.discount-item { display: flex; justify-content: space-between; padding: 5px 10px; font-size: 0.85rem; border-radius: 4px; }
-.discount-item.active { background: var(--primary-light); font-weight: 600; }
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+.markup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: var(--sp-2); }
+.markup-item {
+  display: flex; justify-content: space-between; align-items: center; padding: 8px 12px;
+  border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+  transition: all var(--duration) var(--ease);
+}
+.markup-item:hover { border-color: var(--border); background: var(--gray-50); }
+.markup-item label { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); }
+.markup-item input {
+  width: 55px; text-align: right; padding: 4px 8px; border: 1px solid var(--border);
+  border-radius: var(--radius-xs); font-family: var(--mono); font-size: 0.8rem; outline: none;
+  transition: all var(--duration) var(--ease);
+}
+.markup-item input:focus { border-color: var(--primary-300); box-shadow: var(--shadow-focus); }
+.markup-item input:disabled, .markup-item input[readonly] { background: var(--gray-50); color: var(--text-muted); cursor: not-allowed; }
 
-/* Company selector */
-.company-select { display: flex; align-items: center; gap: 8px; }
-.company-select select { padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-weight: 500; background: var(--surface); }
+.discount-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--sp-2); }
+.discount-item {
+  display: flex; justify-content: space-between; padding: 8px 12px; font-size: 0.8rem;
+  border-radius: var(--radius-sm); color: var(--text-secondary);
+  transition: all var(--duration) var(--ease);
+}
+.discount-item.active { background: var(--primary-50); color: var(--primary-700); font-weight: 600; box-shadow: inset 0 0 0 1px var(--primary-200); }
 
-/* Toast */
-.toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: #fff; padding: 10px 18px; border-radius: var(--radius); font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 1000; }
-.toast.show { transform: translateY(0); opacity: 1; }
+/* ============================================================
+   TEMPLATES PANEL
+   ============================================================ */
+.templates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--sp-4); }
+.template-card {
+  border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--sp-5);
+  background: var(--surface); cursor: pointer; transition: all var(--duration) var(--ease);
+  position: relative; overflow: hidden;
+}
+.template-card:hover { border-color: var(--primary-300); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.template-card-category {
+  font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--primary-600); background: var(--primary-50); padding: 2px 8px; border-radius: 10px;
+  display: inline-block; margin-bottom: var(--sp-2);
+}
+.template-card h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: var(--sp-2); }
+.template-card p { font-size: 0.75rem; color: var(--text-tertiary); line-height: 1.4; }
+.template-card .template-meta { display: flex; gap: var(--sp-3); margin-top: var(--sp-3); font-size: 0.7rem; color: var(--text-muted); }
+.template-card .template-actions { position: absolute; top: var(--sp-3); right: var(--sp-3); display: flex; gap: var(--sp-1); opacity: 0; transition: opacity var(--duration) var(--ease); }
+.template-card:hover .template-actions { opacity: 1; }
 
-/* Print Styles */
+/* ============================================================
+   VERSION PANEL
+   ============================================================ */
+.version-list { display: flex; flex-direction: column; gap: var(--sp-2); }
+.version-item {
+  display: flex; align-items: center; justify-content: space-between; padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+  transition: all var(--duration) var(--ease); cursor: pointer;
+}
+.version-item:hover { border-color: var(--border); background: var(--gray-50); }
+.version-item.active { border-color: var(--primary-300); background: var(--primary-25); }
+.version-item .version-num { font-weight: 700; font-size: 0.85rem; color: var(--primary-600); font-family: var(--mono); min-width: 40px; }
+.version-item .version-meta { font-size: 0.75rem; color: var(--text-tertiary); }
+.version-item .version-total { font-family: var(--mono); font-weight: 600; font-size: 0.85rem; }
+
+/* ============================================================
+   ANALYTICS
+   ============================================================ */
+.analytics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-5); }
+.analytics-card {
+  border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--sp-5);
+  background: var(--surface);
+}
+.analytics-card h4 { font-size: 0.8rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--sp-4); }
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.stat-row .stat-label { font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: var(--sp-2); }
+.stat-row .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
+.stat-row .stat-value { font-family: var(--mono); font-weight: 600; font-size: 0.85rem; }
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(16,24,40,0.6); backdrop-filter: blur(4px);
+  z-index: 500; display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden; transition: all var(--duration-md) var(--ease);
+}
+.modal-backdrop.show { opacity: 1; visibility: visible; }
+.modal {
+  background: var(--surface); border-radius: var(--radius-xl); width: 90%; max-width: 560px;
+  max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-xl);
+  transform: scale(0.95); transition: transform var(--duration-md) var(--ease);
+}
+.modal-backdrop.show .modal { transform: scale(1); }
+.modal-header {
+  padding: var(--sp-5) var(--sp-6); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-header h3 { font-size: 1.05rem; font-weight: 600; }
+.modal-body { padding: var(--sp-6); }
+.modal-footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: var(--sp-3); }
+
+/* ============================================================
+   TOASTS
+   ============================================================ */
+.toast-container { position: fixed; top: var(--sp-5); right: var(--sp-5); z-index: 1000; display: flex; flex-direction: column; gap: var(--sp-2); }
+.toast {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: var(--sp-3) var(--sp-5); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: var(--sp-3);
+  font-size: 0.85rem; font-weight: 500; min-width: 280px; max-width: 420px;
+  transform: translateX(120%); transition: transform var(--duration-lg) var(--ease);
+}
+.toast.show { transform: translateX(0); }
+.toast-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.toast-icon.success { color: var(--success-500); }
+.toast-icon.error { color: var(--error-500); }
+.toast-icon.info { color: var(--primary-500); }
+.toast-icon.warning { color: var(--warning-500); }
+
+/* ============================================================
+   EMPTY STATES
+   ============================================================ */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: var(--sp-10) var(--sp-6); text-align: center;
+}
+.empty-state svg { width: 64px; height: 64px; color: var(--gray-300); margin-bottom: var(--sp-5); }
+[data-theme="dark"] .empty-state svg { color: var(--gray-600); }
+.empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: var(--sp-2); }
+.empty-state p { font-size: 0.85rem; color: var(--text-muted); max-width: 360px; line-height: 1.5; margin-bottom: var(--sp-5); }
+
+/* ============================================================
+   DRAG HANDLE
+   ============================================================ */
+.drag-handle {
+  cursor: grab; display: flex; align-items: center; justify-content: center; width: 20px; color: var(--text-placeholder);
+  transition: color var(--duration) var(--ease);
+}
+.drag-handle:hover { color: var(--text-muted); }
+.drag-handle:active { cursor: grabbing; }
+.boq-row.dragging { opacity: 0.4; }
+.boq-row.drag-over { border-top: 2px solid var(--primary-500); }
+
+/* ============================================================
+   SCHEDULE
+   ============================================================ */
+.schedule-link { font-size: 0.75rem; color: var(--primary-500); cursor: pointer; font-weight: 500; }
+.schedule-link:hover { text-decoration: underline; }
+.schedule-item { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--sp-5); margin-bottom: var(--sp-4); }
+.schedule-item h4 { margin-bottom: var(--sp-3); display: flex; justify-content: space-between; align-items: center; }
+
+/* ============================================================
+   COMPANY SELECT (topbar)
+   ============================================================ */
+.company-select select {
+  padding: 6px 28px 6px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-weight: 500; font-size: 0.8rem; background: var(--surface); color: var(--text);
+  appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+  cursor: pointer; outline: none; transition: all var(--duration) var(--ease);
+}
+.company-select select:focus { border-color: var(--primary-300); box-shadow: var(--shadow-focus); }
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+.search-input {
+  position: relative;
+}
+.search-input input {
+  width: 100%; padding: 8px 12px 8px 34px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 0.85rem; outline: none; background: var(--surface); transition: all var(--duration) var(--ease);
+}
+.search-input input:focus { border-color: var(--primary-300); box-shadow: var(--shadow-focus); }
+.search-input svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); }
+
+/* ============================================================
+   KEYBOARD SHORTCUT HINTS
+   ============================================================ */
+.kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 1px 6px; font-size: 0.65rem; font-family: var(--mono); font-weight: 500;
+  background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 4px;
+  color: var(--text-tertiary); line-height: 1.6;
+}
+
+/* ============================================================
+   ROLE-BASED VISIBILITY
+   ============================================================ */
+.admin-only { display: none; }
+.no-viewer { display: initial; }
+[data-role="admin"] .admin-only { display: initial; }
+[data-role="viewer"] .no-viewer { display: none !important; }
+[data-role="viewer"] .boq-row td input,
+[data-role="viewer"] .boq-row td select { pointer-events: none; opacity: 0.7; }
+
+/* ============================================================
+   PRINT
+   ============================================================ */
 @media print {
-  body { background: #fff; font-size: 11pt; }
-  .app-header, .tabs, .no-print, .btn, .expand-toggle, .sub-panel, .boq-table th.no-print, .boq-table td.no-print { display: none !important; }
+  body { background: #fff; font-size: 10pt; color: #000; }
+  .sidebar, .topbar, .no-print, .btn, .expand-toggle, .sub-panel,
+  .boq-table th.no-print, .boq-table td.no-print, .row-actions,
+  .drag-handle, .row-checkbox, .nav-item, .toast-container { display: none !important; }
+  .main-content { margin-left: 0 !important; }
   .container { max-width: 100%; padding: 0; margin: 0; }
-  .card { border: none; padding: 0; margin-bottom: 12pt; box-shadow: none; }
-  .print-header { display: block !important; text-align: center; margin-bottom: 20pt; padding-bottom: 12pt; border-bottom: 2px solid #000; }
-  .print-header h2 { font-size: 16pt; margin-bottom: 4pt; }
-  .print-header p { font-size: 10pt; color: #555; }
-  .print-info { display: grid !important; grid-template-columns: 1fr 1fr; gap: 4pt; font-size: 10pt; margin-bottom: 16pt; }
+  .card { border: none; padding: 0; margin-bottom: 10pt; box-shadow: none; border-radius: 0; }
+  .card-header { padding: 0 0 6pt; }
+  .card-body { padding: 0; }
+  .print-header { display: flex !important; flex-direction: column; align-items: center; margin-bottom: 18pt; padding-bottom: 10pt; border-bottom: 2.5pt solid #000; }
+  .print-header h2 { font-size: 15pt; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3pt; }
+  .print-header p { font-size: 9pt; color: #555; letter-spacing: 0.04em; text-transform: uppercase; }
+  .print-info { display: grid !important; grid-template-columns: 1fr 1fr; gap: 3pt; font-size: 9pt; margin-bottom: 14pt; }
   .print-info div { padding: 2pt 0; }
-  .print-info strong { min-width: 100pt; display: inline-block; }
-  .print-boq { width: 100%; border-collapse: collapse; margin-bottom: 16pt; }
-  .print-boq th { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 6pt 8pt; border: 1px solid #ccc; font-size: 9pt; text-transform: uppercase; }
-  .print-boq td { padding: 5pt 8pt; border: 1px solid #ddd; font-size: 10pt; }
-  .print-boq td.num { text-align: right; font-family: var(--mono); }
-  .print-summary { margin-top: 12pt; }
+  .print-info strong { min-width: 90pt; display: inline-block; }
+  .print-boq { width: 100%; border-collapse: collapse; margin-bottom: 14pt; page-break-inside: auto; }
+  .print-boq th { background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 5pt 7pt; border: 0.5pt solid #ccc; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+  .print-boq td { padding: 4pt 7pt; border: 0.5pt solid #ddd; font-size: 9pt; }
+  .print-boq td.num { text-align: right; font-family: 'JetBrains Mono', monospace; }
+  .print-boq .section-header td { background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-weight: 700; font-size: 9.5pt; border-left: 2pt solid #000; }
+  .print-summary { margin-top: 10pt; }
   .print-summary table { width: 50%; margin-left: auto; border-collapse: collapse; }
-  .print-summary td { padding: 4pt 8pt; font-size: 10pt; }
-  .print-summary td:last-child { text-align: right; font-family: var(--mono); font-weight: 600; }
-  .print-summary .grand { font-size: 12pt; border-top: 2px solid #000; }
-  .print-footer { margin-top: 30pt; font-size: 9pt; color: #555; }
-  .print-footer .notes { margin-bottom: 16pt; }
-  .print-footer .notes p { margin-bottom: 4pt; }
-  .print-signatures { display: grid !important; grid-template-columns: 1fr 1fr; gap: 40pt; margin-top: 40pt; }
-  .print-signatures .sig-block { border-top: 1px solid #000; padding-top: 8pt; font-size: 10pt; }
+  .print-summary td { padding: 3pt 7pt; font-size: 9pt; }
+  .print-summary td:last-child { text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+  .print-summary .grand { font-size: 11pt; border-top: 2pt solid #000; }
+  .print-footer { margin-top: 28pt; font-size: 8pt; color: #555; }
+  .print-footer .notes { margin-bottom: 14pt; line-height: 1.6; }
+  .print-footer .notes p { margin-bottom: 3pt; }
+  .print-signatures { display: grid !important; grid-template-columns: 1fr 1fr; gap: 36pt; margin-top: 36pt; }
+  .print-signatures .sig-block { border-top: 1pt solid #000; padding-top: 7pt; font-size: 9pt; }
   .tab-content { display: block !important; }
-  #tab-boq { display: block !important; }
-  #tab-schedule, #tab-settings { display: none !important; }
+  #view-boq { display: block !important; }
+  #view-schedule, #view-settings, #view-templates, #view-versions, #view-analytics { display: none !important; }
   #printView { display: block !important; }
   #appView { display: none !important; }
 }
 .print-header, .print-info, .print-signatures { display: none; }
 #printView { display: none; }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-/* Item Schedule */
-.schedule-link { font-size: 0.75rem; color: var(--primary); cursor: pointer; text-decoration: underline; }
-.schedule-item { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
-.schedule-item h4 { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-
-/* Animations */
+/* ============================================================
+   MISC
+   ============================================================ */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-.boq-row { animation: fadeIn 0.2s ease; }
+.boq-row { animation: fadeIn var(--duration-md) var(--ease); }
+.section-row { animation: fadeIn var(--duration-md) var(--ease); }
+
+/* Dark mode toggle */
+.theme-toggle {
+  width: 36px; height: 20px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--gray-100); cursor: pointer; position: relative; transition: all var(--duration) var(--ease);
+}
+.theme-toggle::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--surface); box-shadow: var(--shadow-xs);
+  transition: transform var(--duration-md) var(--ease);
+}
+[data-theme="dark"] .theme-toggle { background: var(--primary-700); border-color: var(--primary-600); }
+[data-theme="dark"] .theme-toggle::after { transform: translateX(16px); }
+
+/* Tab content visibility */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-260px); }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0 !important; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .summary-divider { grid-column: span 1; }
+  .analytics-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
-<body>
+<body data-role="admin" data-theme="light">
 
-<!-- App Header -->
-<header class="app-header">
-  <h1>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    Estimate Calculator
-  </h1>
-  <div class="header-actions">
-    <div class="company-select">
-      <select id="companySelect" onchange="changeCompany()">
-        <option value="domus">Domus Interior Contracting L.L.C</option>
-        <option value="ng">NG Contracting</option>
-        <option value="phoenix">Phoenix Contracting</option>
-        <option value="nomos">Nomos Interior</option>
-        <option value="telos">Telos Projects</option>
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <div>
+        <h1>Domus</h1>
+        <span>Estimate Calculator</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Workspace</div>
+      <div class="nav-item active" data-view="boq" onclick="switchView('boq')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Bill of Quantities
+        <span class="badge" id="boqCount">0</span>
+      </div>
+      <div class="nav-item" data-view="schedule" onclick="switchView('schedule')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Item Schedule
+      </div>
+      <div class="nav-item" data-view="templates" onclick="switchView('templates')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Templates
+        <span class="badge" id="templateCount">0</span>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Manage</div>
+      <div class="nav-item" data-view="versions" onclick="switchView('versions')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        Versions
+        <span class="badge" id="versionCount">0</span>
+      </div>
+      <div class="nav-item" data-view="analytics" onclick="switchView('analytics')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        Analytics
+      </div>
+      <div class="nav-item" data-view="settings" onclick="switchView('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-role">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span id="currentRoleLabel">Admin</span>
+      <span class="role-badge admin" id="roleBadge">Admin</span>
+    </div>
+    <div style="margin-top:var(--sp-2);display:flex;align-items:center;gap:var(--sp-2)">
+      <span style="font-size:0.7rem;color:var(--text-muted)">Dark</span>
+      <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<div class="main-content" id="mainContent">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-breadcrumb">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Domus /
+        <span id="breadcrumbView">Bill of Quantities</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="save-indicator" id="saveIndicator">
+        <div class="save-dot" id="saveDot"></div>
+        <span id="saveLabel">Saved</span>
+      </div>
+      <div class="company-select">
+        <select id="companySelect" onchange="changeCompany()">
+          <option value="domus">Domus Interior Contracting L.L.C</option>
+          <option value="ng">NG Contracting</option>
+          <option value="phoenix">Phoenix Contracting</option>
+          <option value="nomos">Nomos Interior</option>
+          <option value="telos">Telos Projects</option>
+        </select>
+      </div>
+      <select id="roleSelect" onchange="changeRole(this.value)" style="padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.75rem;font-weight:500;background:var(--surface);cursor:pointer;outline:none">
+        <option value="admin">Admin</option>
+        <option value="estimator">Estimator</option>
+        <option value="viewer">Viewer</option>
       </select>
-    </div>
-    <button class="btn btn-sm" onclick="saveEstimate()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1-2 2h11l5 5v11z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      Save
-    </button>
-    <button class="btn btn-sm" onclick="loadEstimate()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Load
-    </button>
-    <button class="btn btn-sm" onclick="newEstimate()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-      New
-    </button>
-    <button class="btn btn-primary btn-sm" onclick="printEstimate()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-      Print / PDF
-    </button>
-  </div>
-</header>
 
-<div id="appView">
-<div class="container">
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" data-tab="boq" onclick="switchTab('boq')">
-      <svg style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Bill of Quantities
-    </div>
-    <div class="tab" data-tab="schedule" onclick="switchTab('schedule')">
-      <svg style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Item Schedule
-    </div>
-    <div class="tab" data-tab="settings" onclick="switchTab('settings')">
-      <svg style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      Settings
-    </div>
-  </div>
-
-  <!-- BOQ Tab -->
-  <div id="tab-boq" class="tab-content active">
-    <!-- Project Info -->
-    <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        Project Information
-      </div>
-      <div class="form-grid">
-        <div class="form-group"><label>Supervisor</label><input type="text" id="supervisor" placeholder="Supervisor name"></div>
-        <div class="form-group span-2"><label>Project Description</label><input type="text" id="projectDesc" placeholder="Brief project description"></div>
-        <div class="form-group"><label>Location</label><input type="text" id="location" placeholder="Property / Area / Street"></div>
-        <div class="form-group"><label>Client Name</label><input type="text" id="clientName" placeholder="Client full name"></div>
-        <div class="form-group"><label>Client Email</label><input type="email" id="clientEmail" placeholder="client@email.com"></div>
-        <div class="form-group"><label>Quote No.</label><input type="text" id="quoteNo" placeholder="Q-001"></div>
-        <div class="form-group"><label>Variation No.</label><input type="text" id="variationNo" placeholder="0" value="0"></div>
-        <div class="form-group"><label>Project No.</label><input type="text" id="projectNo" placeholder="P-001"></div>
-        <div class="form-group"><label>Date</label><input type="date" id="projectDate"></div>
-        <div class="form-group"><label>Est. Duration (days)</label><input type="number" id="duration" value="35" min="1"></div>
-      </div>
-      <p style="margin-top:10px; font-size:0.8rem; color:var(--text-muted); font-style:italic;">This estimation is valid for 14 days from the date hereof.</p>
-    </div>
-
-    <!-- BOQ Table -->
-    <div class="card" style="padding: 0; overflow: hidden;">
-      <div style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);">
-        <div class="card-title" style="margin-bottom: 0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Bill of Quantities
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="addLineItem()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Item
+      <button class="btn btn-sm" onclick="saveEstimate()" title="Ctrl+S"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save</button>
+      <button class="btn btn-sm" onclick="showLoadModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Load</button>
+      <button class="btn btn-sm" onclick="newEstimate()" title="Ctrl+N">New</button>
+      <div style="position:relative">
+        <button class="btn btn-sm" onclick="toggleExportMenu()" id="exportBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Export ▾
         </button>
-      </div>
-      <div style="overflow-x: auto;">
-        <table class="boq-table">
-          <thead>
-            <tr>
-              <th style="width:30px"></th>
-              <th style="width:50px">SL.</th>
-              <th style="min-width:200px">Description</th>
-              <th style="width:80px">Unit</th>
-              <th style="width:80px" class="num">Qty</th>
-              <th style="width:100px" class="num">Rate (AED)</th>
-              <th style="width:120px" class="num">Total (AED)</th>
-              <th style="width:140px" class="no-print">Type</th>
-              <th style="width:70px" class="num no-print">Markup</th>
-              <th style="width:100px" class="num no-print">Cost</th>
-              <th style="width:40px" class="no-print"></th>
-            </tr>
-          </thead>
-          <tbody id="boqBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Summary -->
-    <div class="card" id="summaryCard">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        Summary
-      </div>
-      <div class="summary-grid">
-        <div>
-          <div class="summary-row"><span class="summary-label">Total Domus Cost</span><span class="summary-value" id="sumDomusCost">0.00</span></div>
-          <div class="summary-row"><span class="summary-label">Total Subcontractor Cost</span><span class="summary-value" id="sumSubCost">0.00</span></div>
-          <div class="summary-row"><span class="summary-label">Total Project Cost</span><span class="summary-value" id="sumTotalCost">0.00</span></div>
-          <div class="summary-row"><span class="summary-label">Value Discount Tier</span><span class="summary-value" id="sumDiscountTier">0%</span></div>
-        </div>
-        <div>
-          <div class="summary-row"><span class="summary-label">Weighted Avg. Markup</span><span class="summary-value" id="sumAvgMarkup">0.00%</span></div>
-          <div class="summary-row"><span class="summary-label">Final Weighted Markup (after discount)</span><span class="summary-value" id="sumFinalMarkup">0.00%</span></div>
-          <div class="summary-row"><span class="summary-label">Total Project Price (Before VAT)</span><span class="summary-value highlight" id="sumPriceBeforeVAT">0.00</span></div>
-          <div class="summary-row">
-            <span class="summary-label">Manual Discount %</span>
-            <span><input type="number" id="manualDiscount" value="0" min="0" max="100" step="0.5" style="width:70px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;text-align:right;font-family:var(--mono)" onchange="recalcAll()" oninput="recalcAll()"></span>
+        <div id="exportMenu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);min-width:180px;z-index:300;overflow:hidden">
+          <div class="export-option" onclick="printEstimate()" style="padding:8px 14px;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;gap:8px;transition:background 150ms">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print / PDF <kbd class="kbd" style="margin-left:auto">⌘P</kbd>
+          </div>
+          <div class="export-option" onclick="exportExcel()" style="padding:8px 14px;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;gap:8px;transition:background 150ms">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Export Excel (.xlsx)
+          </div>
+          <div class="export-option" onclick="exportJSON()" style="padding:8px 14px;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;gap:8px;transition:background 150ms">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Export JSON
+          </div>
+          <div style="border-top:1px solid var(--border)"></div>
+          <div class="export-option" onclick="importJSON()" style="padding:8px 14px;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;gap:8px;transition:background 150ms">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Import JSON
           </div>
         </div>
-        <div class="summary-divider"></div>
-        <div>
-          <div class="summary-row"><span class="summary-label">Discounted Price</span><span class="summary-value" id="sumDiscPrice">0.00</span></div>
-          <div class="summary-row"><span class="summary-label">VAT (5%)</span><span class="summary-value" id="sumVAT">0.00</span></div>
-        </div>
-        <div class="summary-grand">
-          <div class="summary-row"><span class="summary-label" style="font-size:1.05rem;font-weight:600">Total Inclusive of VAT</span><span class="summary-value highlight" id="sumGrandTotal" style="font-size:1.4rem">AED 0.00</span></div>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- Item Schedule Tab -->
-  <div id="tab-schedule" class="tab-content">
-    <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Item Schedule — Extended Breakdown
-      </div>
-      <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">For complex items requiring more than 3 sub-items. Link to a BOQ line item and add unlimited sub-items.</p>
-      <div id="scheduleItems"></div>
-      <button class="btn btn-sm" onclick="addScheduleItem()" style="margin-top:12px">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Schedule Item
-      </button>
-    </div>
-  </div>
+  <div id="appView">
+  <div class="container">
 
-  <!-- Settings Tab -->
-  <div id="tab-settings" class="tab-content">
-    <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
-        Trade Markup Rates
+    <!-- ======== BOQ VIEW ======== -->
+    <div id="view-boq" class="tab-content active">
+      <!-- Project Info -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Project Information
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--sp-2)">
+            <span style="font-size:0.75rem;color:var(--text-muted);font-family:var(--mono)" id="versionBadge">V1</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group"><label>Supervisor</label><input type="text" id="supervisor" placeholder="Supervisor name"></div>
+            <div class="form-group span-2"><label>Project Description</label><input type="text" id="projectDesc" placeholder="Brief project description"></div>
+            <div class="form-group"><label>Location</label><input type="text" id="location" placeholder="Property / Area / Street"></div>
+            <div class="form-group"><label>Client Name</label><input type="text" id="clientName" placeholder="Client full name"></div>
+            <div class="form-group"><label>Client Email</label><input type="email" id="clientEmail" placeholder="client@email.com"></div>
+            <div class="form-group"><label>Quote No.</label><input type="text" id="quoteNo" placeholder="Q-001"></div>
+            <div class="form-group"><label>Variation No.</label><input type="text" id="variationNo" placeholder="0" value="0"></div>
+            <div class="form-group"><label>Project No.</label><input type="text" id="projectNo" placeholder="P-001"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="projectDate"></div>
+            <div class="form-group"><label>Est. Duration (days)</label><input type="number" id="duration" value="35" min="1"></div>
+          </div>
+          <p class="form-hint">This estimation is valid for 14 days from the date hereof.</p>
+        </div>
       </div>
-      <div class="markup-grid" id="markupGrid"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        Value Discount Tiers (Applied to Markup)
+
+      <!-- BOQ Table -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Bill of Quantities
+          </div>
+          <div style="display:flex;gap:var(--sp-2);align-items:center" class="no-viewer">
+            <button class="btn btn-sm" onclick="addSection()" title="Add section header">+ Section</button>
+            <button class="btn btn-sm" onclick="duplicateSelected()" title="Ctrl+D" id="btnDuplicate" style="display:none">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Duplicate
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="addLineItem()" title="Ctrl+N">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Item
+            </button>
+          </div>
+        </div>
+        <div class="boq-wrapper">
+          <table class="boq-table">
+            <thead>
+              <tr>
+                <th style="width:24px" class="no-print"></th>
+                <th style="width:24px" class="no-print"></th>
+                <th style="width:60px">No.</th>
+                <th style="min-width:200px">Description</th>
+                <th style="width:70px">Unit</th>
+                <th style="width:75px" class="num">Qty</th>
+                <th style="width:100px" class="num">Rate (AED)</th>
+                <th style="width:110px" class="num">Total (AED)</th>
+                <th style="width:120px" class="no-print">Type</th>
+                <th style="width:65px" class="num no-print">Markup</th>
+                <th style="width:95px" class="num no-print">Cost</th>
+                <th style="width:50px" class="no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="boqBody"></tbody>
+          </table>
+        </div>
+        <div id="boqEmpty" class="empty-state" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+          <h3>No line items yet</h3>
+          <p>Start building your estimate by adding line items or inserting a template.</p>
+          <div style="display:flex;gap:var(--sp-3)">
+            <button class="btn btn-primary" onclick="addLineItem()">Add First Item</button>
+            <button class="btn" onclick="switchView('templates')">Browse Templates</button>
+          </div>
+        </div>
       </div>
-      <div class="discount-grid" id="discountGrid"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-        Company Settings
-      </div>
-      <div class="form-grid" style="max-width:400px">
-        <div class="form-group">
-          <label>Default Labor Rate (AED/hr)</label>
-          <input type="number" id="defaultLaborRate" value="17" min="1" step="0.5" onchange="updateLaborRate()">
+
+      <!-- Summary -->
+      <div class="card" id="summaryCard">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Summary
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="summary-grid">
+            <div>
+              <div class="summary-row"><span class="summary-label">Total Domus Cost</span><span class="summary-value" id="sumDomusCost">0.00</span></div>
+              <div class="summary-row"><span class="summary-label">Total Subcontractor Cost</span><span class="summary-value" id="sumSubCost">0.00</span></div>
+              <div class="summary-row"><span class="summary-label">Total Project Cost</span><span class="summary-value" id="sumTotalCost">0.00</span></div>
+              <div class="summary-row"><span class="summary-label">Value Discount Tier</span><span class="summary-value" id="sumDiscountTier">0%</span></div>
+            </div>
+            <div>
+              <div class="summary-row"><span class="summary-label">Weighted Avg. Markup</span><span class="summary-value" id="sumAvgMarkup">0.00%</span></div>
+              <div class="summary-row"><span class="summary-label">Final Weighted Markup</span><span class="summary-value" id="sumFinalMarkup">0.00%</span></div>
+              <div class="summary-row"><span class="summary-label">Price Before VAT</span><span class="summary-value highlight" id="sumPriceBeforeVAT">0.00</span></div>
+              <div class="summary-row">
+                <span class="summary-label">Manual Discount %</span>
+                <span><input type="number" id="manualDiscount" value="0" min="0" max="100" step="0.5" style="width:65px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-xs);text-align:right;font-family:var(--mono);font-size:0.85rem;outline:none" onchange="recalcAll();markUnsaved()" oninput="recalcAll()"></span>
+              </div>
+            </div>
+            <div class="summary-divider"></div>
+            <div>
+              <div class="summary-row"><span class="summary-label">Discounted Price</span><span class="summary-value" id="sumDiscPrice">0.00</span></div>
+              <div class="summary-row"><span class="summary-label">VAT (5%)</span><span class="summary-value" id="sumVAT">0.00</span></div>
+            </div>
+            <div class="summary-grand">
+              <div class="summary-row" style="border:none"><span class="summary-label" style="font-size:1.05rem;font-weight:600">Total Inclusive of VAT</span><span class="summary-value highlight" id="sumGrandTotal" style="font-size:1.4rem">AED 0.00</span></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- ======== SCHEDULE VIEW ======== -->
+    <div id="view-schedule" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Item Schedule — Extended Breakdown
+          </div>
+          <button class="btn btn-sm no-viewer" onclick="addScheduleItem()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Schedule Item
+          </button>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--text-tertiary);font-size:0.8rem;margin-bottom:var(--sp-4)">For complex items requiring more than 3 sub-items. Link to a BOQ line item and add unlimited sub-items.</p>
+          <div id="scheduleItems"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== TEMPLATES VIEW ======== -->
+    <div id="view-templates" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Item Templates
+          </div>
+          <div style="display:flex;gap:var(--sp-3);align-items:center">
+            <div class="search-input" style="width:220px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="templateSearch" placeholder="Search templates..." oninput="renderTemplates()">
+            </div>
+            <button class="btn btn-primary btn-sm no-viewer" onclick="showSaveTemplateModal()">+ New Template</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="templates-grid" id="templatesGrid"></div>
+          <div id="templatesEmpty" class="empty-state" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+            <h3>No templates yet</h3>
+            <p>Save line items as reusable templates for one-click insertion into any estimate.</p>
+            <button class="btn btn-primary" onclick="showSaveTemplateModal()">Create First Template</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== VERSIONS VIEW ======== -->
+    <div id="view-versions" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Version History
+          </div>
+          <button class="btn btn-primary btn-sm no-viewer" onclick="saveVersion()">Save as New Version</button>
+        </div>
+        <div class="card-body">
+          <div class="version-list" id="versionList"></div>
+          <div id="versionsEmpty" class="empty-state" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><circle cx="12" cy="12" r="1"/></svg>
+            <h3>No versions saved</h3>
+            <p>Save snapshots of your estimate to track changes over time and revert if needed.</p>
+            <button class="btn btn-primary" onclick="saveVersion()">Save First Version</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== ANALYTICS VIEW ======== -->
+    <div id="view-analytics" class="tab-content">
+      <div class="analytics-grid" id="analyticsGrid">
+        <div class="analytics-card">
+          <h4>Cost Breakdown by Trade</h4>
+          <div id="costPieChart" style="display:flex;justify-content:center;margin-bottom:var(--sp-4)"></div>
+          <div id="costBreakdownList"></div>
+        </div>
+        <div class="analytics-card">
+          <h4>Domus vs Subcontractor Split</h4>
+          <div id="splitChart" style="margin-bottom:var(--sp-4)"></div>
+          <div id="splitDetails"></div>
+        </div>
+        <div class="analytics-card">
+          <h4>Effective Markup by Trade</h4>
+          <div id="markupAnalysisList"></div>
+        </div>
+        <div class="analytics-card">
+          <h4>Value Discount Impact</h4>
+          <div id="discountImpactDetails"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== SETTINGS VIEW ======== -->
+    <div id="view-settings" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+            Trade Markup Rates
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="markup-grid" id="markupGrid"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Value Discount Tiers
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="discount-grid" id="discountGrid"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Company Settings
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid" style="max-width:400px">
+            <div class="form-group">
+              <label>Default Labor Rate (AED/hr)</label>
+              <input type="number" id="defaultLaborRate" value="17" min="1" step="0.5" onchange="updateLaborRate()">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Keyboard Shortcuts</div>
+        </div>
+        <div class="card-body" style="font-size:0.8rem;color:var(--text-secondary);display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--sp-2)">
+          <div style="display:flex;justify-content:space-between;padding:4px 0"><span>New line item</span><kbd class="kbd">Ctrl+N</kbd></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Save estimate</span><kbd class="kbd">Ctrl+S</kbd></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Print / PDF</span><kbd class="kbd">Ctrl+P</kbd></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Duplicate selected</span><kbd class="kbd">Ctrl+D</kbd></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Undo</span><kbd class="kbd">Ctrl+Z</kbd></div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Redo</span><kbd class="kbd">Ctrl+Shift+Z</kbd></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
   </div>
 </div>
-</div>
 
-<!-- Print View -->
+<!-- ============================================================
+     PRINT VIEW
+     ============================================================ -->
 <div id="printView">
-  <div class="print-header">
-    <h2 id="printCompanyName">Domus Interior Contracting L.L.C</h2>
-    <p>Estimation / Quotation</p>
-  </div>
+  <div class="print-header"><h2 id="printCompanyName">Domus Interior Contracting L.L.C</h2><p>Estimation / Quotation</p></div>
   <div class="print-info" id="printInfo"></div>
   <table class="print-boq" id="printBoqTable"></table>
   <div class="print-summary" id="printSummary"></div>
@@ -405,33 +1127,93 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
     <div class="notes">
       <p><strong>Estimated Duration:</strong> <span id="printDuration">35</span> days</p>
       <p><em>This estimation is valid for 14 days from the date hereof.</em></p>
-      <p style="margin-top:8pt"><em>This is a provisional BOQ, it's re-measurable and can change during the project. All variations that may occur will be quoted for separately.</em></p>
+      <p style="margin-top:6pt"><em>This is a provisional BOQ, it's re-measurable and can change during the project. All variations that may occur will be quoted for separately.</em></p>
       <p><em>Approval of the Estimation / Quotation is construed as approval of the attached Terms and Conditions.</em></p>
     </div>
     <div class="print-signatures">
-      <div class="sig-block">
-        <p>For, <span id="printCompanyRep">Domus Interior Contracting L.L.C</span> Representative</p>
-        <p style="margin-top:4pt">Name: ____________________</p>
-        <p>Signature: ____________________</p>
-        <p>Date: ____________________</p>
-      </div>
-      <div class="sig-block">
-        <p>For, Client</p>
-        <p style="margin-top:4pt">Name: ____________________</p>
-        <p>Signature: ____________________</p>
-        <p>Date: ____________________</p>
-      </div>
+      <div class="sig-block"><p>For, <span id="printCompanyRep">Domus Interior Contracting L.L.C</span> Representative</p><p style="margin-top:4pt">Name: ____________________</p><p>Signature: ____________________</p><p>Date: ____________________</p></div>
+      <div class="sig-block"><p>For, Client</p><p style="margin-top:4pt">Name: ____________________</p><p>Signature: ____________________</p><p>Date: ____________________</p></div>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- Modal Backdrop -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header"><h3 id="modalTitle">Modal</h3><button class="btn-icon" onclick="closeModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Hidden file input for import -->
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileImport(event)">
 
 <script>
 // ============================================================
+// DATABASE ABSTRACTION LAYER
+// Swap this implementation to use Supabase, REST API, etc.
+// ============================================================
+const db = (() => {
+  const DB_NAME = 'DomusEstimatorV2';
+  const DB_VERSION = 2;
+  let _db = null;
+
+  function open() {
+    return new Promise((resolve, reject) => {
+      if (_db) { resolve(_db); return; }
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const d = e.target.result;
+        if (!d.objectStoreNames.contains('estimates')) d.createObjectStore('estimates', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('templates')) d.createObjectStore('templates', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('versions')) d.createObjectStore('versions', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('companies')) d.createObjectStore('companies', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('users')) d.createObjectStore('users', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('meta')) d.createObjectStore('meta', { keyPath: 'key' });
+      };
+      req.onsuccess = (e) => { _db = e.target.result; resolve(_db); };
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  async function tx(store, mode) { const d = await open(); return d.transaction(store, mode).objectStore(store); }
+
+  function promisify(req) {
+    return new Promise((res, rej) => { req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error); });
+  }
+
+  return {
+    // Estimates
+    async saveEstimate(data) { const s = await tx('estimates','readwrite'); return promisify(s.put(data)); },
+    async getEstimate(id) { const s = await tx('estimates','readonly'); return promisify(s.get(id)); },
+    async listEstimates() { const s = await tx('estimates','readonly'); return promisify(s.getAll()); },
+    async deleteEstimate(id) { const s = await tx('estimates','readwrite'); return promisify(s.delete(id)); },
+
+    // Templates
+    async saveTemplate(data) { const s = await tx('templates','readwrite'); return promisify(s.put(data)); },
+    async getTemplate(id) { const s = await tx('templates','readonly'); return promisify(s.get(id)); },
+    async listTemplates() { const s = await tx('templates','readonly'); return promisify(s.getAll()); },
+    async deleteTemplate(id) { const s = await tx('templates','readwrite'); return promisify(s.delete(id)); },
+
+    // Versions
+    async saveVersion(data) { const s = await tx('versions','readwrite'); return promisify(s.put(data)); },
+    async listVersions() { const s = await tx('versions','readonly'); return promisify(s.getAll()); },
+    async getVersion(id) { const s = await tx('versions','readonly'); return promisify(s.get(id)); },
+    async deleteVersion(id) { const s = await tx('versions','readwrite'); return promisify(s.delete(id)); },
+
+    // Meta (last estimate id, preferences, etc.)
+    async setMeta(key, value) { const s = await tx('meta','readwrite'); return promisify(s.put({ key, value })); },
+    async getMeta(key) { const s = await tx('meta','readonly'); const r = await promisify(s.get(key)); return r ? r.value : null; },
+  };
+})();
+
+// ============================================================
 // DATA MODEL
 // ============================================================
-
 const COMPANIES = {
   domus: { name: 'Domus Interior Contracting L.L.C', laborRate: 17 },
   ng: { name: 'NG Contracting', laborRate: 17 },
@@ -473,25 +1255,74 @@ const DISCOUNT_TIERS = [
 
 const UNITS = ['M2','M','LM','Item','Lot','No.','Set','Kg','L','CM','MM','Pair','Roll','Sheet','Box','Bag','Trip','Day','Hr'];
 
+const TRADE_COLORS = ['#2970ff','#12b76a','#f79009','#f04438','#7a5af8','#ee46bc','#0ba5ec','#667085','#f63d68','#15b79e','#ff692e','#6172f3','#66c61c','#ef6820','#4e5ba6','#b93815','#36bffa'];
+
 let currentCompany = 'domus';
+let currentRole = 'admin';
 let markupRates = {};
 let lineItems = [];
 let scheduleItems = [];
+let templates = [];
+let versions = [];
+let currentEstimateId = null;
+let currentVersion = 1;
 let nextLineId = 1;
 let nextScheduleId = 1;
+let selectedRows = new Set();
+let saveState = 'saved'; // saved | saving | unsaved
 
-// Initialize markup rates from defaults
+// Undo/Redo
+let undoStack = [];
+let redoStack = [];
+const MAX_UNDO = 20;
+
+function pushUndo() {
+  undoStack.push(JSON.stringify({ lineItems, scheduleItems }));
+  if (undoStack.length > MAX_UNDO) undoStack.shift();
+  redoStack = [];
+}
+
+function undo() {
+  if (undoStack.length === 0) return;
+  redoStack.push(JSON.stringify({ lineItems, scheduleItems }));
+  const state = JSON.parse(undoStack.pop());
+  lineItems = state.lineItems;
+  scheduleItems = state.scheduleItems;
+  renderBOQ(); renderSchedule(); recalcAll();
+  showToast('Undone', 'info');
+}
+
+function redo() {
+  if (redoStack.length === 0) return;
+  undoStack.push(JSON.stringify({ lineItems, scheduleItems }));
+  const state = JSON.parse(redoStack.pop());
+  lineItems = state.lineItems;
+  scheduleItems = state.scheduleItems;
+  renderBOQ(); renderSchedule(); recalcAll();
+  showToast('Redone', 'info');
+}
+
+// ============================================================
+// INIT
+// ============================================================
 function initMarkupRates() {
   TRADE_TYPES.forEach(t => { markupRates[t.key] = t.markup; });
 }
 
+function generateId() {
+  return 'est_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6);
+}
+
+// ============================================================
+// FORMATTING
+// ============================================================
+function fmt(n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function escHtml(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+
 // ============================================================
 // CORE CALCULATIONS
 // ============================================================
-
-function getMarkupRate(typeKey) {
-  return markupRates[typeKey] || 0;
-}
+function getMarkupRate(typeKey) { return markupRates[typeKey] || 0; }
 
 function getValueDiscount(totalProjectCost) {
   for (let i = DISCOUNT_TIERS.length - 1; i >= 0; i--) {
@@ -510,19 +1341,11 @@ function calcSubItem(sub) {
 }
 
 function calcLineItem(item, valueDiscount) {
-  // Sum sub-item costs
+  if (item.isSection) return item;
   let cost = 0;
   item.subItems.forEach(sub => { cost += calcSubItem(sub); });
-
-  // Add schedule item cost if linked
   const linked = scheduleItems.filter(s => s.linkedLineId === item.id);
-  linked.forEach(sch => {
-    let schCost = 0;
-    sch.subItems.forEach(sub => { schCost += calcSubItem(sub); });
-    sch.total = schCost;
-    cost += schCost;
-  });
-
+  linked.forEach(sch => { let sc = 0; sch.subItems.forEach(sub => { sc += calcSubItem(sub); }); sch.total = sc; cost += sc; });
   item.cost = cost;
   const baseMarkup = getMarkupRate(item.type);
   item.baseMarkup = baseMarkup;
@@ -535,38 +1358,27 @@ function calcLineItem(item, valueDiscount) {
 }
 
 function recalcAll() {
-  // Step 1: compute all costs first (without discount) to get total project cost
+  // Step 1: costs
   let totalCost = 0;
   lineItems.forEach(item => {
+    if (item.isSection) return;
     let cost = 0;
     item.subItems.forEach(sub => { cost += calcSubItem(sub); });
     const linked = scheduleItems.filter(s => s.linkedLineId === item.id);
-    linked.forEach(sch => {
-      let schCost = 0;
-      sch.subItems.forEach(sub => { schCost += calcSubItem(sub); });
-      sch.total = schCost;
-      cost += schCost;
-    });
+    linked.forEach(sch => { let sc = 0; sch.subItems.forEach(sub => { sc += calcSubItem(sub); }); sch.total = sc; cost += sc; });
     item.cost = cost;
     totalCost += cost;
   });
 
-  // Step 2: get value discount from total cost
   const valueDiscount = getValueDiscount(totalCost);
 
-  // Step 3: compute final prices with discount
-  let domusCost = 0, subCost = 0;
-  let totalPrice = 0;
-  let weightedMarkupNum = 0, weightedMarkupDen = 0;
-  let finalWeightedNum = 0;
+  let domusCost = 0, subCost = 0, totalPrice = 0;
+  let weightedMarkupNum = 0, weightedMarkupDen = 0, finalWeightedNum = 0;
 
   lineItems.forEach(item => {
+    if (item.isSection) return;
     calcLineItem(item, valueDiscount);
-    if (item.type === 'subcontracted') {
-      subCost += item.cost;
-    } else {
-      domusCost += item.cost;
-    }
+    if (item.type === 'subcontracted') subCost += item.cost; else domusCost += item.cost;
     totalPrice += item.price;
     if (item.cost > 0) {
       weightedMarkupNum += item.baseMarkup * item.cost;
@@ -577,13 +1389,11 @@ function recalcAll() {
 
   const weightedAvgMarkup = weightedMarkupDen > 0 ? weightedMarkupNum / weightedMarkupDen : 0;
   const finalWeightedMarkup = weightedMarkupDen > 0 ? finalWeightedNum / weightedMarkupDen : 0;
-
   const manualDiscount = parseFloat(document.getElementById('manualDiscount').value) || 0;
   const discountedPrice = totalPrice * (1 - manualDiscount / 100);
   const vat = discountedPrice * 0.05;
   const grandTotal = discountedPrice + vat;
 
-  // Update summary
   document.getElementById('sumDomusCost').textContent = fmt(domusCost);
   document.getElementById('sumSubCost').textContent = fmt(subCost);
   document.getElementById('sumTotalCost').textContent = fmt(totalCost);
@@ -595,34 +1405,70 @@ function recalcAll() {
   document.getElementById('sumVAT').textContent = fmt(vat);
   document.getElementById('sumGrandTotal').textContent = 'AED ' + fmt(grandTotal);
 
-  // Update discount tier highlight in settings
   renderDiscountTiers(totalCost);
+  updateBOQCalcs();
+  updateBoqBadge();
+}
 
-  // Update BOQ table calculated values
+function updateBOQCalcs() {
   lineItems.forEach(item => {
+    if (item.isSection) return;
     const row = document.querySelector(`[data-line-id="${item.id}"]`);
     if (!row) return;
-    row.querySelector('.calc-rate').textContent = fmt(item.rate);
-    row.querySelector('.calc-total').textContent = fmt(item.total);
-    row.querySelector('.calc-markup').textContent = (item.finalMarkup * 100).toFixed(1) + '%';
-    row.querySelector('.calc-cost').textContent = fmt(item.cost);
-    // Update sub-item totals
-    updateSubItemDisplay(item);
+    const rateEl = row.querySelector('.calc-rate');
+    const totalEl = row.querySelector('.calc-total');
+    const markupEl = row.querySelector('.calc-markup');
+    const costEl = row.querySelector('.calc-cost');
+    if (rateEl) rateEl.textContent = fmt(item.rate);
+    if (totalEl) totalEl.textContent = fmt(item.total);
+    if (markupEl) markupEl.textContent = (item.finalMarkup * 100).toFixed(1) + '%';
+    if (costEl) costEl.textContent = fmt(item.cost);
+
+    // Zero-cost warning
+    if (item.cost === 0 && item.description) row.classList.add('zero-cost');
+    else row.classList.remove('zero-cost');
+
+    // Sub-item inline updates
+    item.subItems.forEach((sub, si) => {
+      const matEl = document.getElementById(`matSub_${item.id}_${si}`);
+      const labEl = document.getElementById(`labSub_${item.id}_${si}`);
+      const totEl = document.getElementById(`subTot_${item.id}_${si}`);
+      if (matEl) matEl.textContent = fmt(sub.matSubtotal);
+      if (labEl) labEl.textContent = fmt(sub.laborSubtotal);
+      if (totEl) totEl.textContent = fmt(sub.total);
+    });
   });
+
+  // Section subtotals
+  let currentSectionRow = null;
+  let sectionTotal = 0;
+  lineItems.forEach(item => {
+    if (item.isSection) {
+      if (currentSectionRow) {
+        const el = document.getElementById(`secTotal_${currentSectionRow.id}`);
+        if (el) el.textContent = 'AED ' + fmt(sectionTotal);
+      }
+      currentSectionRow = item;
+      sectionTotal = 0;
+    } else {
+      sectionTotal += item.total || 0;
+    }
+  });
+  if (currentSectionRow) {
+    const el = document.getElementById(`secTotal_${currentSectionRow.id}`);
+    if (el) el.textContent = 'AED ' + fmt(sectionTotal);
+  }
+}
+
+function updateBoqBadge() {
+  const count = lineItems.filter(i => !i.isSection).length;
+  document.getElementById('boqCount').textContent = count;
+  document.getElementById('boqEmpty').style.display = count === 0 ? 'flex' : 'none';
 }
 
 // ============================================================
-// FORMATTING
+// LINE ITEMS
 // ============================================================
-
-function fmt(n) {
-  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-// ============================================================
-// UI RENDERING
-// ============================================================
-
 function createSubItem(laborRate) {
   return {
     matRate: 0, matUnit: 'Item', matQty: 0, matSubtotal: 0,
@@ -632,79 +1478,193 @@ function createSubItem(laborRate) {
   };
 }
 
-function addLineItem() {
-  const item = {
-    id: nextLineId++,
-    description: '',
-    unit: 'Item',
-    qty: 1,
-    type: 'base_works',
-    subItems: [createSubItem()],
-    expanded: false,
+function addLineItem(insertData) {
+  pushUndo();
+  const item = insertData ? { ...insertData, id: nextLineId++ } : {
+    id: nextLineId++, description: '', unit: 'Item', qty: 1, type: 'base_works',
+    subItems: [createSubItem()], expanded: false, notes: '',
     cost: 0, baseMarkup: 0.40, markupDiscount: 0, finalMarkup: 0.40, price: 0, rate: 0, total: 0
   };
   lineItems.push(item);
-  renderBOQ();
-  recalcAll();
+  renderBOQ(); recalcAll(); markUnsaved();
+}
+
+function addSection() {
+  pushUndo();
+  lineItems.push({ id: nextLineId++, isSection: true, description: 'New Section', expanded: false });
+  renderBOQ(); recalcAll(); markUnsaved();
 }
 
 function removeLineItem(id) {
+  pushUndo();
   lineItems = lineItems.filter(i => i.id !== id);
-  // Unlink schedule items
+  selectedRows.delete(id);
   scheduleItems.forEach(s => { if (s.linkedLineId === id) s.linkedLineId = null; });
-  renderBOQ();
-  recalcAll();
+  renderBOQ(); recalcAll(); markUnsaved(); updateSelectionUI();
 }
 
 function toggleExpand(id) {
   const item = lineItems.find(i => i.id === id);
   if (!item) return;
   item.expanded = !item.expanded;
-  renderBOQ();
-  recalcAll();
+  renderBOQ(); recalcAll();
 }
 
 function addSubItem(lineId) {
   const item = lineItems.find(i => i.id === lineId);
   if (!item || item.subItems.length >= 3) return;
+  pushUndo();
   item.subItems.push(createSubItem());
-  renderBOQ();
-  recalcAll();
+  renderBOQ(); recalcAll(); markUnsaved();
 }
 
 function removeSubItem(lineId, subIdx) {
   const item = lineItems.find(i => i.id === lineId);
   if (!item || item.subItems.length <= 1) return;
+  pushUndo();
   item.subItems.splice(subIdx, 1);
-  renderBOQ();
-  recalcAll();
+  renderBOQ(); recalcAll(); markUnsaved();
 }
 
+function updateField(id, field, value) {
+  const item = lineItems.find(i => i.id === id);
+  if (!item) return;
+  item[field] = value;
+  recalcAll(); markUnsaved();
+}
+
+function updateSub(lineId, subIdx, field, value) {
+  const item = lineItems.find(i => i.id === lineId);
+  if (!item) return;
+  item.subItems[subIdx][field] = parseFloat(value) || 0;
+  recalcAll(); markUnsaved();
+}
+
+function duplicateLineItem(id) {
+  pushUndo();
+  const item = lineItems.find(i => i.id === id);
+  if (!item) return;
+  const clone = JSON.parse(JSON.stringify(item));
+  clone.id = nextLineId++;
+  clone.subItems.forEach(s => { s.matSubtotal = 0; s.laborSubtotal = 0; s.total = 0; });
+  const idx = lineItems.findIndex(i => i.id === id);
+  lineItems.splice(idx + 1, 0, clone);
+  renderBOQ(); recalcAll(); markUnsaved();
+}
+
+function duplicateSelected() {
+  if (selectedRows.size === 0) return;
+  pushUndo();
+  const toAdd = [];
+  lineItems.forEach(item => {
+    if (selectedRows.has(item.id)) {
+      const clone = JSON.parse(JSON.stringify(item));
+      clone.id = nextLineId++;
+      toAdd.push({ after: item.id, clone });
+    }
+  });
+  toAdd.reverse().forEach(({ after, clone }) => {
+    const idx = lineItems.findIndex(i => i.id === after);
+    lineItems.splice(idx + 1, 0, clone);
+  });
+  selectedRows.clear();
+  renderBOQ(); recalcAll(); markUnsaved(); updateSelectionUI();
+  showToast(`Duplicated ${toAdd.length} item(s)`, 'success');
+}
+
+function toggleRowSelect(id) {
+  if (selectedRows.has(id)) selectedRows.delete(id); else selectedRows.add(id);
+  updateSelectionUI();
+}
+
+function updateSelectionUI() {
+  document.getElementById('btnDuplicate').style.display = selectedRows.size > 0 ? 'inline-flex' : 'none';
+  document.querySelectorAll('.boq-row').forEach(row => {
+    const id = parseInt(row.getAttribute('data-line-id'));
+    row.classList.toggle('selected', selectedRows.has(id));
+    const cb = row.querySelector('.row-checkbox');
+    if (cb) cb.checked = selectedRows.has(id);
+  });
+}
+
+// ============================================================
+// LINE NUMBERING (sections: 1.0, items: 1.1, 1.2...)
+// ============================================================
+function getLineNumbers() {
+  let sectionNum = 0, itemNum = 0;
+  return lineItems.map(item => {
+    if (item.isSection) { sectionNum++; itemNum = 0; return sectionNum + '.0'; }
+    itemNum++;
+    return sectionNum > 0 ? sectionNum + '.' + itemNum : '' + itemNum;
+  });
+}
+
+// ============================================================
+// BOQ RENDERING
+// ============================================================
 function renderBOQ() {
   const tbody = document.getElementById('boqBody');
   tbody.innerHTML = '';
+  const nums = getLineNumbers();
+  const chevron = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+  const gripIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg>`;
+  const isViewer = currentRole === 'viewer';
 
   lineItems.forEach((item, idx) => {
-    // Main row
+    if (item.isSection) {
+      const tr = document.createElement('tr');
+      tr.className = 'section-row';
+      tr.setAttribute('data-line-id', item.id);
+      tr.setAttribute('draggable', !isViewer);
+      tr.ondragstart = (e) => dragStart(e, item.id);
+      tr.ondragover = (e) => dragOver(e);
+      tr.ondrop = (e) => drop(e, item.id);
+      tr.ondragend = dragEnd;
+      tr.innerHTML = `
+        <td class="no-print"><div class="drag-handle">${gripIcon}</div></td>
+        <td class="no-print"></td>
+        <td><span class="line-num">${nums[idx]}</span></td>
+        <td colspan="5"><input type="text" value="${escHtml(item.description)}" style="font-weight:700;font-size:0.9rem;border:none;background:transparent;width:100%;padding:4px 0" onchange="updateField(${item.id},'description',this.value)" ${isViewer?'readonly':''}></td>
+        <td class="no-print" colspan="2"></td>
+        <td class="num no-print"><span class="section-subtotal" id="secTotal_${item.id}">AED 0.00</span></td>
+        <td class="no-print"><button class="btn-icon" onclick="removeLineItem(${item.id})" title="Delete section"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>`;
+      tbody.appendChild(tr);
+      return;
+    }
+
     const tr = document.createElement('tr');
     tr.className = 'boq-row';
     tr.setAttribute('data-line-id', item.id);
-
-    const chevron = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+    tr.setAttribute('draggable', !isViewer);
+    tr.ondragstart = (e) => dragStart(e, item.id);
+    tr.ondragover = (e) => dragOver(e);
+    tr.ondrop = (e) => drop(e, item.id);
+    tr.ondragend = dragEnd;
 
     tr.innerHTML = `
-      <td><div class="expand-toggle ${item.expanded ? 'open' : ''}" onclick="toggleExpand(${item.id})">${chevron}</div></td>
-      <td style="font-weight:600;color:var(--text-secondary)">${idx + 1}</td>
+      <td class="no-print"><div class="drag-handle">${gripIcon}</div></td>
+      <td class="no-print"><input type="checkbox" class="row-checkbox" ${selectedRows.has(item.id)?'checked':''} onchange="toggleRowSelect(${item.id})"></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:4px">
+          <div class="expand-toggle ${item.expanded ? 'open' : ''}" onclick="toggleExpand(${item.id})">${chevron}</div>
+          <span class="line-num">${nums[idx]}</span>
+        </div>
+      </td>
       <td><input type="text" value="${escHtml(item.description)}" placeholder="Item description..." onchange="updateField(${item.id},'description',this.value)"></td>
-      <td><select onchange="updateField(${item.id},'unit',this.value)">${UNITS.map(u => `<option value="${u}" ${item.unit === u ? 'selected' : ''}>${u}</option>`).join('')}</select></td>
-      <td class="num"><input type="number" value="${item.qty}" min="0" step="any" style="text-align:right" onchange="updateField(${item.id},'qty',parseFloat(this.value)||0)" oninput="updateField(${item.id},'qty',parseFloat(this.value)||0)"></td>
+      <td><select onchange="updateField(${item.id},'unit',this.value)">${UNITS.map(u=>`<option value="${u}" ${item.unit===u?'selected':''}>${u}</option>`).join('')}</select></td>
+      <td class="num"><input type="number" value="${item.qty}" min="0" step="any" style="text-align:right;font-family:var(--mono);font-size:0.85rem" onchange="updateField(${item.id},'qty',parseFloat(this.value)||0)" oninput="updateField(${item.id},'qty',parseFloat(this.value)||0)"></td>
       <td class="num"><span class="calc-value calc-rate">${fmt(item.rate)}</span></td>
       <td class="num"><span class="calc-value total calc-total">${fmt(item.total)}</span></td>
-      <td class="no-print"><select onchange="updateField(${item.id},'type',this.value)">${TRADE_TYPES.map(t => `<option value="${t.key}" ${item.type === t.key ? 'selected' : ''}>${t.label}</option>`).join('')}</select></td>
-      <td class="num no-print"><span class="calc-value calc-markup">${(item.finalMarkup * 100).toFixed(1)}%</span></td>
+      <td class="no-print"><select onchange="updateField(${item.id},'type',this.value)">${TRADE_TYPES.map(t=>`<option value="${t.key}" ${item.type===t.key?'selected':''}>${t.label}</option>`).join('')}</select></td>
+      <td class="num no-print"><span class="calc-value markup-badge calc-markup">${(item.finalMarkup*100).toFixed(1)}%</span></td>
       <td class="num no-print"><span class="calc-value calc-cost">${fmt(item.cost)}</span></td>
-      <td class="no-print"><button class="btn-icon" onclick="removeLineItem(${item.id})" title="Delete item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
-    `;
+      <td class="no-print">
+        <div class="row-actions">
+          <button class="btn-icon" onclick="duplicateLineItem(${item.id})" title="Duplicate"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+          <button class="btn-icon" onclick="showSaveTemplateModalForItem(${item.id})" title="Save as template"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+          <button class="btn-icon" onclick="removeLineItem(${item.id})" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+      </td>`;
     tbody.appendChild(tr);
 
     // Sub-item panel
@@ -712,14 +1672,13 @@ function renderBOQ() {
       const subTr = document.createElement('tr');
       subTr.className = 'sub-panel';
       const subTd = document.createElement('td');
-      subTd.colSpan = 11;
-      let subHtml = '<div class="sub-panel-inner">';
+      subTd.colSpan = 12;
+      let html = '<div class="sub-panel-inner">';
 
       item.subItems.forEach((sub, si) => {
-        subHtml += `
-        <div class="sub-item">
+        html += `<div class="sub-item">
           <div class="sub-item-section">
-            <h5>Material — Sub-item ${si + 1}</h5>
+            <h5>Material — Sub-item ${si+1}</h5>
             <div class="sub-fields">
               <div class="sub-field"><label>Rate (AED)</label><input type="number" value="${sub.matRate}" min="0" step="any" onchange="updateSub(${item.id},${si},'matRate',this.value)" oninput="updateSub(${item.id},${si},'matRate',this.value)"></div>
               <div class="sub-field"><label>Qty</label><input type="number" value="${sub.matQty}" min="0" step="any" onchange="updateSub(${item.id},${si},'matQty',this.value)" oninput="updateSub(${item.id},${si},'matQty',this.value)"></div>
@@ -727,7 +1686,7 @@ function renderBOQ() {
             </div>
           </div>
           <div class="sub-item-section">
-            <h5>Labor — Sub-item ${si + 1}</h5>
+            <h5>Labor — Sub-item ${si+1}</h5>
             <div class="sub-fields">
               <div class="sub-field"><label>Rate/hr</label><input type="number" value="${sub.laborRate}" min="0" step="any" onchange="updateSub(${item.id},${si},'laborRate',this.value)" oninput="updateSub(${item.id},${si},'laborRate',this.value)"></div>
               <div class="sub-field"><label>Employees</label><input type="number" value="${sub.laborEmployees}" min="0" step="1" onchange="updateSub(${item.id},${si},'laborEmployees',this.value)" oninput="updateSub(${item.id},${si},'laborEmployees',this.value)"></div>
@@ -736,243 +1695,563 @@ function renderBOQ() {
               <div class="sub-field"><label>Subtotal</label><div class="sub-total" id="labSub_${item.id}_${si}">${fmt(sub.laborSubtotal)}</div></div>
             </div>
           </div>
-          <div class="sub-item-total" id="subTotal_${item.id}_${si}">
-            ${fmt(sub.total)}
-            ${item.subItems.length > 1 ? `<br><button class="btn-icon" onclick="removeSubItem(${item.id},${si})" style="margin-top:4px" title="Remove sub-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+          <div class="sub-item-total">
+            <span id="subTot_${item.id}_${si}">${fmt(sub.total)}</span>
+            ${item.subItems.length > 1 ? `<br><button class="btn-icon" onclick="removeSubItem(${item.id},${si})" style="margin-top:4px" title="Remove sub-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
           </div>
         </div>`;
       });
 
+      // Linked schedule items
       const linkedSchedules = scheduleItems.filter(s => s.linkedLineId === item.id);
       if (linkedSchedules.length > 0) {
-        subHtml += `<div style="margin-top:8px;padding:6px 10px;background:var(--primary-light);border-radius:4px;font-size:0.8rem;color:var(--primary)">
+        html += `<div style="margin-top:8px;padding:8px 12px;background:var(--primary-25);border:1px solid var(--primary-100);border-radius:var(--radius-sm);font-size:0.8rem;color:var(--primary-600)">
           <strong>+ ${linkedSchedules.length} schedule item(s) linked</strong> — total: AED ${fmt(linkedSchedules.reduce((a,s) => a + (s.total||0), 0))}
         </div>`;
       }
 
-      subHtml += `<div class="sub-actions">`;
-      if (item.subItems.length < 3) {
-        subHtml += `<button class="btn btn-sm" onclick="addSubItem(${item.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Sub-item</button>`;
-      }
-      subHtml += `<span class="schedule-link" onclick="linkScheduleItem(${item.id})">+ Add to Item Schedule (unlimited sub-items)</span>`;
-      subHtml += `</div></div>`;
+      // Notes field
+      html += `<input class="notes-input" type="text" placeholder="Internal notes (not printed)..." value="${escHtml(item.notes||'')}" onchange="updateField(${item.id},'notes',this.value)">`;
 
-      subTd.innerHTML = subHtml;
+      html += `<div class="sub-actions">`;
+      if (item.subItems.length < 3) {
+        html += `<button class="btn btn-sm" onclick="addSubItem(${item.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Sub-item</button>`;
+      }
+      html += `<span class="schedule-link" onclick="linkScheduleItem(${item.id})">+ Add to Item Schedule</span>`;
+      html += `</div></div>`;
+
+      subTd.innerHTML = html;
       subTr.appendChild(subTd);
       tbody.appendChild(subTr);
     }
   });
-}
-
-function updateSubItemDisplay(item) {
-  item.subItems.forEach((sub, si) => {
-    const matEl = document.getElementById(`matSub_${item.id}_${si}`);
-    const labEl = document.getElementById(`labSub_${item.id}_${si}`);
-    const totEl = document.getElementById(`subTotal_${item.id}_${si}`);
-    if (matEl) matEl.textContent = fmt(sub.matSubtotal);
-    if (labEl) labEl.textContent = fmt(sub.laborSubtotal);
-    if (totEl) {
-      // Keep the remove button if present
-      const btn = totEl.querySelector('button');
-      totEl.childNodes[0].textContent = fmt(sub.total);
-    }
-  });
-}
-
-function updateField(id, field, value) {
-  const item = lineItems.find(i => i.id === id);
-  if (!item) return;
-  item[field] = value;
-  recalcAll();
-}
-
-function updateSub(lineId, subIdx, field, value) {
-  const item = lineItems.find(i => i.id === lineId);
-  if (!item) return;
-  item.subItems[subIdx][field] = parseFloat(value) || 0;
-  recalcAll();
-}
-
-function escHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str || '';
-  return div.innerHTML;
+  updateBoqBadge();
 }
 
 // ============================================================
-// SETTINGS RENDERING
+// DRAG & DROP REORDER
 // ============================================================
+let draggedId = null;
 
+function dragStart(e, id) {
+  draggedId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  const row = e.target.closest('tr');
+  if (row) setTimeout(() => row.classList.add('dragging'), 0);
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const row = e.target.closest('tr');
+  document.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+  if (row) row.classList.add('drag-over');
+}
+
+function drop(e, targetId) {
+  e.preventDefault();
+  document.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+  if (draggedId === null || draggedId === targetId) return;
+  pushUndo();
+  const fromIdx = lineItems.findIndex(i => i.id === draggedId);
+  const toIdx = lineItems.findIndex(i => i.id === targetId);
+  if (fromIdx === -1 || toIdx === -1) return;
+  const [moved] = lineItems.splice(fromIdx, 1);
+  lineItems.splice(toIdx, 0, moved);
+  renderBOQ(); recalcAll(); markUnsaved();
+}
+
+function dragEnd(e) {
+  draggedId = null;
+  document.querySelectorAll('.dragging').forEach(r => r.classList.remove('dragging'));
+  document.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
 function renderMarkupGrid() {
-  const grid = document.getElementById('markupGrid');
-  grid.innerHTML = TRADE_TYPES.map(t => `
+  const isLocked = currentRole !== 'admin';
+  document.getElementById('markupGrid').innerHTML = TRADE_TYPES.map(t => `
     <div class="markup-item">
       <label>${t.label}</label>
-      <input type="number" value="${(markupRates[t.key] * 100).toFixed(0)}" min="0" max="100" step="1" 
-        onchange="markupRates['${t.key}'] = parseFloat(this.value)/100; recalcAll()" 
-        style="font-family:var(--mono)"> <span style="font-size:0.8rem;color:var(--text-muted)">%</span>
+      <div style="display:flex;align-items:center;gap:4px">
+        <input type="number" value="${(markupRates[t.key] * 100).toFixed(0)}" min="0" max="100" step="1"
+          onchange="markupRates['${t.key}'] = parseFloat(this.value)/100; recalcAll(); markUnsaved()"
+          ${isLocked ? 'disabled readonly' : ''}>
+        <span style="font-size:0.75rem;color:var(--text-muted)">%</span>
+      </div>
     </div>
   `).join('');
 }
 
 function renderDiscountTiers(totalCost) {
-  const grid = document.getElementById('discountGrid');
-  grid.innerHTML = DISCOUNT_TIERS.map(t => {
+  document.getElementById('discountGrid').innerHTML = DISCOUNT_TIERS.map(t => {
     const active = totalCost >= t.min && totalCost <= t.max;
-    const maxLabel = t.max === Infinity ? '+' : fmt(t.max);
     return `<div class="discount-item ${active ? 'active' : ''}">
       <span>AED ${fmt(t.min)}${t.max === Infinity ? '+' : ' — ' + fmt(t.max)}</span>
-      <span>${(t.discount * 100).toFixed(0)}% discount</span>
+      <span>${(t.discount * 100).toFixed(0)}%</span>
     </div>`;
   }).join('');
 }
 
 // ============================================================
-// ITEM SCHEDULE
+// SCHEDULE
 // ============================================================
-
 function addScheduleItem(linkedLineId) {
-  const sch = {
-    id: nextScheduleId++,
-    linkedLineId: linkedLineId || null,
-    description: '',
-    subItems: [createSubItem()],
-    total: 0
-  };
-  scheduleItems.push(sch);
-  renderSchedule();
-  recalcAll();
+  pushUndo();
+  scheduleItems.push({
+    id: nextScheduleId++, linkedLineId: linkedLineId || null,
+    description: '', subItems: [createSubItem()], total: 0
+  });
+  renderSchedule(); recalcAll(); markUnsaved();
 }
 
-function linkScheduleItem(lineId) {
-  addScheduleItem(lineId);
-  switchTab('schedule');
-}
+function linkScheduleItem(lineId) { addScheduleItem(lineId); switchView('schedule'); }
 
 function removeScheduleItem(id) {
+  pushUndo();
   scheduleItems = scheduleItems.filter(s => s.id !== id);
-  renderSchedule();
-  recalcAll();
+  renderSchedule(); recalcAll(); markUnsaved();
 }
 
 function addScheduleSubItem(schId) {
   const sch = scheduleItems.find(s => s.id === schId);
   if (!sch) return;
+  pushUndo();
   sch.subItems.push(createSubItem());
-  renderSchedule();
-  recalcAll();
+  renderSchedule(); recalcAll(); markUnsaved();
 }
 
 function removeScheduleSubItem(schId, subIdx) {
   const sch = scheduleItems.find(s => s.id === schId);
   if (!sch || sch.subItems.length <= 1) return;
+  pushUndo();
   sch.subItems.splice(subIdx, 1);
-  renderSchedule();
-  recalcAll();
+  renderSchedule(); recalcAll(); markUnsaved();
 }
 
 function updateScheduleField(schId, field, value) {
   const sch = scheduleItems.find(s => s.id === schId);
   if (!sch) return;
-  sch[field] = value;
-  recalcAll();
+  sch[field] = value; recalcAll(); markUnsaved();
 }
 
 function updateScheduleSub(schId, subIdx, field, value) {
   const sch = scheduleItems.find(s => s.id === schId);
   if (!sch) return;
   sch.subItems[subIdx][field] = parseFloat(value) || 0;
-  recalcAll();
-  renderSchedule();
+  recalcAll(); markUnsaved(); renderSchedule();
 }
 
 function renderSchedule() {
   const container = document.getElementById('scheduleItems');
   if (scheduleItems.length === 0) {
-    container.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">No schedule items yet. Add one from a BOQ line item or click below.</p>';
+    container.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <h3>No schedule items</h3>
+      <p>Link unlimited sub-items from BOQ line items for complex breakdowns.</p>
+    </div>`;
     return;
   }
-
   container.innerHTML = scheduleItems.map(sch => {
     const linkedItem = lineItems.find(i => i.id === sch.linkedLineId);
-    const linkedLabel = linkedItem ? `Linked to: SL ${lineItems.indexOf(linkedItem) + 1} — ${linkedItem.description || 'Untitled'}` : 'Unlinked';
-
+    const linkedLabel = linkedItem ? `Linked to: SL ${lineItems.indexOf(linkedItem)+1} — ${linkedItem.description||'Untitled'}` : 'Unlinked';
     return `<div class="schedule-item">
       <h4>
         <span>
-          <span style="font-size:0.8rem;color:var(--primary);font-weight:500">${linkedLabel}</span>
-          <br>
-          <input type="text" value="${escHtml(sch.description)}" placeholder="Schedule item description" style="border:1px solid var(--border);padding:4px 8px;border-radius:4px;width:300px;margin-top:4px" onchange="updateScheduleField(${sch.id},'description',this.value)">
-          <select style="margin-left:8px;padding:4px 8px;border:1px solid var(--border);border-radius:4px" onchange="updateScheduleField(${sch.id},'linkedLineId',parseInt(this.value)||null)">
+          <span style="font-size:0.75rem;color:var(--primary-500);font-weight:500">${linkedLabel}</span><br>
+          <input type="text" value="${escHtml(sch.description)}" placeholder="Schedule item description" style="border:1px solid var(--border);padding:5px 10px;border-radius:var(--radius-sm);width:280px;margin-top:4px;outline:none" onchange="updateScheduleField(${sch.id},'description',this.value)">
+          <select style="margin-left:8px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);outline:none" onchange="updateScheduleField(${sch.id},'linkedLineId',parseInt(this.value)||null)">
             <option value="">— Link to BOQ item —</option>
-            ${lineItems.map((li, idx) => `<option value="${li.id}" ${sch.linkedLineId === li.id ? 'selected' : ''}>SL ${idx+1}: ${li.description || 'Untitled'}</option>`).join('')}
+            ${lineItems.filter(l=>!l.isSection).map((li,i)=>`<option value="${li.id}" ${sch.linkedLineId===li.id?'selected':''}>SL ${i+1}: ${li.description||'Untitled'}</option>`).join('')}
           </select>
         </span>
-        <span>
-          <span style="font-family:var(--mono);font-weight:600;color:var(--primary);margin-right:12px">AED ${fmt(sch.total)}</span>
+        <span style="display:flex;align-items:center;gap:var(--sp-3)">
+          <span style="font-family:var(--mono);font-weight:600;color:var(--primary-600)">AED ${fmt(sch.total)}</span>
           <button class="btn btn-danger btn-sm" onclick="removeScheduleItem(${sch.id})">Remove</button>
         </span>
       </h4>
-      ${sch.subItems.map((sub, si) => `
+      ${sch.subItems.map((sub,si) => `
         <div class="sub-item">
-          <div class="sub-item-section">
-            <h5>Material — Sub-item ${si + 1}</h5>
+          <div class="sub-item-section"><h5>Material — Sub-item ${si+1}</h5>
             <div class="sub-fields">
-              <div class="sub-field"><label>Rate (AED)</label><input type="number" value="${sub.matRate}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'matRate',this.value)" oninput="updateScheduleSub(${sch.id},${si},'matRate',this.value)"></div>
-              <div class="sub-field"><label>Qty</label><input type="number" value="${sub.matQty}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'matQty',this.value)" oninput="updateScheduleSub(${sch.id},${si},'matQty',this.value)"></div>
+              <div class="sub-field"><label>Rate</label><input type="number" value="${sub.matRate}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'matRate',this.value)"></div>
+              <div class="sub-field"><label>Qty</label><input type="number" value="${sub.matQty}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'matQty',this.value)"></div>
               <div class="sub-field"><label>Subtotal</label><div class="sub-total">${fmt(sub.matSubtotal)}</div></div>
             </div>
           </div>
-          <div class="sub-item-section">
-            <h5>Labor — Sub-item ${si + 1}</h5>
+          <div class="sub-item-section"><h5>Labor — Sub-item ${si+1}</h5>
             <div class="sub-fields">
-              <div class="sub-field"><label>Rate/hr</label><input type="number" value="${sub.laborRate}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'laborRate',this.value)" oninput="updateScheduleSub(${sch.id},${si},'laborRate',this.value)"></div>
-              <div class="sub-field"><label>Employees</label><input type="number" value="${sub.laborEmployees}" min="0" step="1" onchange="updateScheduleSub(${sch.id},${si},'laborEmployees',this.value)" oninput="updateScheduleSub(${sch.id},${si},'laborEmployees',this.value)"></div>
-              <div class="sub-field"><label>Hours</label><input type="number" value="${sub.laborHours}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'laborHours',this.value)" oninput="updateScheduleSub(${sch.id},${si},'laborHours',this.value)"></div>
-              <div class="sub-field"><label>Days</label><input type="number" value="${sub.laborDays}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'laborDays',this.value)" oninput="updateScheduleSub(${sch.id},${si},'laborDays',this.value)"></div>
+              <div class="sub-field"><label>Rate/hr</label><input type="number" value="${sub.laborRate}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'laborRate',this.value)"></div>
+              <div class="sub-field"><label>Employees</label><input type="number" value="${sub.laborEmployees}" min="0" step="1" onchange="updateScheduleSub(${sch.id},${si},'laborEmployees',this.value)"></div>
+              <div class="sub-field"><label>Hours</label><input type="number" value="${sub.laborHours}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'laborHours',this.value)"></div>
+              <div class="sub-field"><label>Days</label><input type="number" value="${sub.laborDays}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'laborDays',this.value)"></div>
               <div class="sub-field"><label>Subtotal</label><div class="sub-total">${fmt(sub.laborSubtotal)}</div></div>
             </div>
           </div>
-          <div class="sub-item-total">
-            ${fmt(sub.total)}
-            ${sch.subItems.length > 1 ? `<br><button class="btn-icon" onclick="removeScheduleSubItem(${sch.id},${si})" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+          <div class="sub-item-total">${fmt(sub.total)}
+            ${sch.subItems.length > 1 ? `<br><button class="btn-icon" onclick="removeScheduleSubItem(${sch.id},${si})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
           </div>
-        </div>
-      `).join('')}
-      <button class="btn btn-sm" onclick="addScheduleSubItem(${sch.id})" style="margin-top:8px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Sub-item</button>
+        </div>`).join('')}
+      <button class="btn btn-sm" onclick="addScheduleSubItem(${sch.id})" style="margin-top:var(--sp-3)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Sub-item</button>
     </div>`;
   }).join('');
 }
 
 // ============================================================
-// TABS
+// TEMPLATES
 // ============================================================
+const DEFAULT_TEMPLATES = [
+  { id: 'tpl_office_desk', name: 'Office Desk', category: 'Furniture', description: 'Standard office desk with drawers',
+    line_item_data: { description: 'Office Desk with Drawers', unit: 'No.', qty: 1, type: 'furniture',
+      subItems: [{ matRate: 850, matUnit: 'Item', matQty: 1, matSubtotal: 850, laborRate: 17, laborEmployees: 1, laborHours: 4, laborDays: 1, laborSubtotal: 68, total: 918 }] }},
+  { id: 'tpl_door_type_a', name: 'Standard Door Type A', category: 'Joinery', description: 'Solid core flush door with frame and hardware',
+    line_item_data: { description: 'Solid Core Flush Door Type A (incl. frame & hardware)', unit: 'No.', qty: 1, type: 'joinery',
+      subItems: [{ matRate: 450, matUnit: 'Item', matQty: 1, matSubtotal: 450, laborRate: 17, laborEmployees: 2, laborHours: 3, laborDays: 1, laborSubtotal: 102, total: 552 }] }},
+  { id: 'tpl_road_m2', name: 'Road per M2', category: 'Civil Works', description: 'Asphalt road construction per square meter',
+    line_item_data: { description: 'Asphalt Road Construction', unit: 'M2', qty: 1, type: 'civil_works',
+      subItems: [{ matRate: 35, matUnit: 'M2', matQty: 1, matSubtotal: 35, laborRate: 17, laborEmployees: 3, laborHours: 2, laborDays: 1, laborSubtotal: 102, total: 137 }] }}
+];
 
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.toggle('active', t.id === 'tab-' + name));
+async function loadTemplates() {
+  templates = await db.listTemplates();
+  if (templates.length === 0) {
+    // Seed defaults
+    for (const t of DEFAULT_TEMPLATES) {
+      t.created_at = new Date().toISOString();
+      await db.saveTemplate(t);
+    }
+    templates = await db.listTemplates();
+  }
+  document.getElementById('templateCount').textContent = templates.length;
+  renderTemplates();
+}
+
+function renderTemplates() {
+  const search = (document.getElementById('templateSearch')?.value || '').toLowerCase();
+  const filtered = templates.filter(t =>
+    (!search || t.name.toLowerCase().includes(search) || (t.category||'').toLowerCase().includes(search))
+  );
+
+  const grid = document.getElementById('templatesGrid');
+  const empty = document.getElementById('templatesEmpty');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = filtered.map(t => {
+    const data = t.line_item_data;
+    const subCount = data.subItems ? data.subItems.length : 0;
+    const cost = data.subItems ? data.subItems.reduce((a,s) => a + (s.total||0), 0) : 0;
+    return `<div class="template-card" onclick="insertTemplate('${t.id}')">
+      <div class="template-actions">
+        <button class="btn-icon" onclick="event.stopPropagation();deleteTemplate('${t.id}')" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+      </div>
+      <div class="template-card-category">${escHtml(t.category||'General')}</div>
+      <h4>${escHtml(t.name)}</h4>
+      <p>${escHtml(t.description||data.description||'')}</p>
+      <div class="template-meta">
+        <span>${subCount} sub-item(s)</span>
+        <span>·</span>
+        <span>AED ${fmt(cost)} base cost</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function insertTemplate(id) {
+  const tpl = templates.find(t => t.id === id);
+  if (!tpl) return;
+  const data = JSON.parse(JSON.stringify(tpl.line_item_data));
+  addLineItem({
+    description: data.description || '', unit: data.unit || 'Item', qty: data.qty || 1,
+    type: data.type || 'base_works', subItems: data.subItems || [createSubItem()],
+    expanded: false, notes: '', cost: 0, baseMarkup: 0, markupDiscount: 0, finalMarkup: 0, price: 0, rate: 0, total: 0
+  });
+  showToast(`Inserted "${tpl.name}"`, 'success');
+}
+
+async function deleteTemplate(id) {
+  if (!confirm('Delete this template?')) return;
+  await db.deleteTemplate(id);
+  templates = templates.filter(t => t.id !== id);
+  document.getElementById('templateCount').textContent = templates.length;
+  renderTemplates();
+  showToast('Template deleted', 'info');
+}
+
+function showSaveTemplateModal() { showSaveTemplateModalForItem(null); }
+
+function showSaveTemplateModalForItem(lineId) {
+  const item = lineId ? lineItems.find(i => i.id === lineId) : null;
+  document.getElementById('modalTitle').textContent = 'Save as Template';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group" style="margin-bottom:var(--sp-4)"><label>Template Name</label><input type="text" id="tplName" value="${item ? escHtml(item.description) : ''}" placeholder="e.g. Standard Door Type A"></div>
+    <div class="form-group" style="margin-bottom:var(--sp-4)"><label>Category</label><input type="text" id="tplCategory" placeholder="e.g. Joinery, Furniture, Civil Works"></div>
+    <div class="form-group"><label>Description (optional)</label><input type="text" id="tplDesc" placeholder="Brief description"></div>
+    ${!item ? '<p style="font-size:0.75rem;color:var(--text-muted);margin-top:var(--sp-3)">This will create an empty template. To save from an existing line item, use the template icon on the BOQ row.</p>' : ''}
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="doSaveTemplate(${lineId||'null'})">Save Template</button>
+  `;
+  openModal();
+}
+
+async function doSaveTemplate(lineId) {
+  const name = document.getElementById('tplName').value.trim();
+  if (!name) { showToast('Name is required', 'error'); return; }
+  const category = document.getElementById('tplCategory').value.trim() || 'General';
+  const desc = document.getElementById('tplDesc').value.trim();
+  const item = lineId ? lineItems.find(i => i.id === lineId) : null;
+  const tpl = {
+    id: 'tpl_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2,4),
+    name, category, description: desc,
+    line_item_data: item ? {
+      description: item.description, unit: item.unit, qty: item.qty, type: item.type,
+      subItems: JSON.parse(JSON.stringify(item.subItems))
+    } : { description: name, unit: 'Item', qty: 1, type: 'base_works', subItems: [createSubItem()] },
+    created_at: new Date().toISOString()
+  };
+  await db.saveTemplate(tpl);
+  templates.push(tpl);
+  document.getElementById('templateCount').textContent = templates.length;
+  renderTemplates();
+  closeModal();
+  showToast(`Template "${name}" saved`, 'success');
+}
+
+// ============================================================
+// VERSIONS
+// ============================================================
+async function loadVersions() {
+  versions = await db.listVersions();
+  // Filter to current estimate
+  if (currentEstimateId) versions = versions.filter(v => v.estimate_id === currentEstimateId);
+  versions.sort((a,b) => (b.version_number||0) - (a.version_number||0));
+  document.getElementById('versionCount').textContent = versions.length;
+  renderVersions();
+}
+
+function renderVersions() {
+  const container = document.getElementById('versionList');
+  const empty = document.getElementById('versionsEmpty');
+
+  if (versions.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+
+  container.innerHTML = versions.map(v => {
+    const snap = v.snapshot || {};
+    const totalItems = (snap.lineItems || []).filter(i => !i.isSection).length;
+    const totalPrice = (snap.lineItems || []).reduce((a,i) => a + (i.price || 0), 0);
+    const date = v.created_at ? new Date(v.created_at).toLocaleString() : '—';
+    const isActive = v.version_number === currentVersion;
+    return `<div class="version-item ${isActive ? 'active' : ''}" onclick="loadVersion('${v.id}')">
+      <span class="version-num">V${v.version_number}</span>
+      <span class="version-meta">${date} · ${totalItems} items${v.note ? ' · ' + escHtml(v.note) : ''}</span>
+      <span class="version-total">AED ${fmt(totalPrice)}</span>
+    </div>`;
+  }).join('');
+}
+
+async function saveVersion() {
+  const vNum = versions.length > 0 ? Math.max(...versions.map(v => v.version_number||0)) + 1 : 1;
+  const v = {
+    id: 'ver_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2,4),
+    estimate_id: currentEstimateId || 'draft',
+    version_number: vNum,
+    snapshot: getEstimateData(),
+    created_by: currentRole,
+    note: '',
+    created_at: new Date().toISOString()
+  };
+  await db.saveVersion(v);
+  currentVersion = vNum;
+  document.getElementById('versionBadge').textContent = 'V' + vNum;
+  versions.unshift(v);
+  document.getElementById('versionCount').textContent = versions.length;
+  renderVersions();
+  showToast(`Version V${vNum} saved`, 'success');
+}
+
+async function loadVersion(id) {
+  const v = await db.getVersion(id);
+  if (!v || !v.snapshot) { showToast('Version not found', 'error'); return; }
+  restoreEstimate(v.snapshot);
+  currentVersion = v.version_number;
+  document.getElementById('versionBadge').textContent = 'V' + v.version_number;
+  showToast(`Loaded V${v.version_number}`, 'info');
+}
+
+// ============================================================
+// ANALYTICS
+// ============================================================
+function renderAnalytics() {
+  // Cost breakdown by trade
+  const tradeCosts = {};
+  lineItems.forEach(item => {
+    if (item.isSection) return;
+    const label = TRADE_TYPES.find(t => t.key === item.type)?.label || item.type;
+    tradeCosts[label] = (tradeCosts[label] || 0) + (item.cost || 0);
+  });
+
+  const entries = Object.entries(tradeCosts).filter(([,v]) => v > 0).sort((a,b) => b[1] - a[1]);
+  const totalCost = entries.reduce((a,[,v]) => a + v, 0);
+
+  // Pie chart (inline SVG)
+  const pieContainer = document.getElementById('costPieChart');
+  if (entries.length === 0) {
+    pieContainer.innerHTML = '<p style="color:var(--text-muted);font-size:0.8rem">No cost data yet</p>';
+  } else {
+    let svg = '<svg viewBox="-1.1 -1.1 2.2 2.2" width="160" height="160" style="transform:rotate(-90deg)">';
+    let cumulative = 0;
+    entries.forEach(([label, cost], i) => {
+      const pct = cost / totalCost;
+      const startAngle = cumulative * 2 * Math.PI;
+      cumulative += pct;
+      const endAngle = cumulative * 2 * Math.PI;
+      const largeArc = pct > 0.5 ? 1 : 0;
+      const x1 = Math.cos(startAngle), y1 = Math.sin(startAngle);
+      const x2 = Math.cos(endAngle), y2 = Math.sin(endAngle);
+      const color = TRADE_COLORS[i % TRADE_COLORS.length];
+      if (entries.length === 1) {
+        svg += `<circle cx="0" cy="0" r="1" fill="${color}"/>`;
+      } else {
+        svg += `<path d="M 0 0 L ${x1} ${y1} A 1 1 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${color}" stroke="var(--surface)" stroke-width="0.02"/>`;
+      }
+    });
+    svg += '</svg>';
+    pieContainer.innerHTML = svg;
+  }
+
+  // Cost breakdown list
+  document.getElementById('costBreakdownList').innerHTML = entries.map(([label, cost], i) => `
+    <div class="stat-row">
+      <span class="stat-label"><span class="stat-dot" style="background:${TRADE_COLORS[i%TRADE_COLORS.length]}"></span> ${label}</span>
+      <span class="stat-value">AED ${fmt(cost)} <span style="color:var(--text-muted);font-size:0.7rem">(${(cost/totalCost*100).toFixed(1)}%)</span></span>
+    </div>
+  `).join('') || '<p style="color:var(--text-muted);font-size:0.8rem">No data</p>';
+
+  // Domus vs Sub split
+  let domusCost = 0, subCost = 0;
+  lineItems.forEach(item => {
+    if (item.isSection) return;
+    if (item.type === 'subcontracted') subCost += item.cost || 0;
+    else domusCost += item.cost || 0;
+  });
+  const splitTotal = domusCost + subCost;
+  const domusPct = splitTotal > 0 ? (domusCost / splitTotal * 100) : 0;
+  const subPct = splitTotal > 0 ? (subCost / splitTotal * 100) : 0;
+
+  document.getElementById('splitChart').innerHTML = splitTotal > 0 ? `
+    <div style="display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--gray-100)">
+      <div style="width:${domusPct}%;background:var(--primary-500);transition:width 300ms"></div>
+      <div style="width:${subPct}%;background:var(--warning-500);transition:width 300ms"></div>
+    </div>
+  ` : '';
+
+  document.getElementById('splitDetails').innerHTML = `
+    <div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--primary-500)"></span> Domus</span><span class="stat-value">AED ${fmt(domusCost)} (${domusPct.toFixed(1)}%)</span></div>
+    <div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--warning-500)"></span> Subcontracted</span><span class="stat-value">AED ${fmt(subCost)} (${subPct.toFixed(1)}%)</span></div>
+  `;
+
+  // Markup analysis
+  const tradeMarkups = {};
+  lineItems.forEach(item => {
+    if (item.isSection || !item.cost) return;
+    const label = TRADE_TYPES.find(t => t.key === item.type)?.label || item.type;
+    if (!tradeMarkups[label]) tradeMarkups[label] = { cost: 0, price: 0 };
+    tradeMarkups[label].cost += item.cost;
+    tradeMarkups[label].price += item.price;
+  });
+  document.getElementById('markupAnalysisList').innerHTML = Object.entries(tradeMarkups).map(([label, d]) => {
+    const effectiveMarkup = d.cost > 0 ? ((d.price / d.cost - 1) * 100) : 0;
+    return `<div class="stat-row"><span class="stat-label">${label}</span><span class="stat-value">${effectiveMarkup.toFixed(1)}%</span></div>`;
+  }).join('') || '<p style="color:var(--text-muted);font-size:0.8rem">No data</p>';
+
+  // Discount impact
+  const valueDiscount = getValueDiscount(totalCost);
+  const priceWithoutDiscount = lineItems.filter(i=>!i.isSection).reduce((a,i) => a + i.cost * (1 + (markupRates[i.type]||0)), 0);
+  const priceWithDiscount = lineItems.filter(i=>!i.isSection).reduce((a,i) => a + i.price, 0);
+  const discountSavings = priceWithoutDiscount - priceWithDiscount;
+  document.getElementById('discountImpactDetails').innerHTML = `
+    <div class="stat-row"><span class="stat-label">Total Project Cost</span><span class="stat-value">AED ${fmt(totalCost)}</span></div>
+    <div class="stat-row"><span class="stat-label">Current Tier Discount</span><span class="stat-value">${(valueDiscount*100).toFixed(0)}%</span></div>
+    <div class="stat-row"><span class="stat-label">Price (no discount)</span><span class="stat-value">AED ${fmt(priceWithoutDiscount)}</span></div>
+    <div class="stat-row"><span class="stat-label">Price (with discount)</span><span class="stat-value" style="color:var(--success-600)">AED ${fmt(priceWithDiscount)}</span></div>
+    <div class="stat-row"><span class="stat-label">Markup Savings</span><span class="stat-value" style="color:var(--error-600)">- AED ${fmt(discountSavings)}</span></div>
+  `;
+}
+
+// ============================================================
+// VIEW SWITCHING
+// ============================================================
+function switchView(name) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === name));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.toggle('active', t.id === 'view-' + name));
+  const labels = { boq: 'Bill of Quantities', schedule: 'Item Schedule', templates: 'Templates', versions: 'Version History', analytics: 'Analytics', settings: 'Settings' };
+  document.getElementById('breadcrumbView').textContent = labels[name] || name;
+  if (name === 'analytics') renderAnalytics();
+  if (name === 'templates') renderTemplates();
+  if (name === 'versions') loadVersions();
+}
+
+// ============================================================
+// SIDEBAR & THEME
+// ============================================================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+}
+
+// ============================================================
+// ROLES
+// ============================================================
+function changeRole(role) {
+  currentRole = role;
+  document.body.setAttribute('data-role', role);
+  document.getElementById('currentRoleLabel').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+  const badge = document.getElementById('roleBadge');
+  badge.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+  badge.className = 'role-badge ' + role;
+  renderMarkupGrid();
+  renderBOQ();
 }
 
 // ============================================================
 // COMPANY
 // ============================================================
-
 function changeCompany() {
   currentCompany = document.getElementById('companySelect').value;
   document.getElementById('defaultLaborRate').value = COMPANIES[currentCompany].laborRate;
+  markUnsaved();
 }
 
 function updateLaborRate() {
-  const rate = parseFloat(document.getElementById('defaultLaborRate').value) || 17;
-  COMPANIES[currentCompany].laborRate = rate;
+  COMPANIES[currentCompany].laborRate = parseFloat(document.getElementById('defaultLaborRate').value) || 17;
+  markUnsaved();
 }
 
 // ============================================================
-// SAVE / LOAD / NEW
+// SAVE / LOAD
 // ============================================================
-
 function getEstimateData() {
   return {
+    id: currentEstimateId,
     company: currentCompany,
     markupRates: { ...markupRates },
     projectInfo: {
@@ -988,49 +2267,79 @@ function getEstimateData() {
       duration: document.getElementById('duration').value,
       manualDiscount: document.getElementById('manualDiscount').value
     },
-    lineItems,
-    scheduleItems,
-    nextLineId,
-    nextScheduleId,
-    companies: COMPANIES
+    lineItems: JSON.parse(JSON.stringify(lineItems)),
+    scheduleItems: JSON.parse(JSON.stringify(scheduleItems)),
+    version: currentVersion,
+    nextLineId, nextScheduleId,
+    companies: JSON.parse(JSON.stringify(COMPANIES)),
+    status: 'draft',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   };
 }
 
-function saveEstimate() {
+async function saveEstimate() {
+  setSaveState('saving');
+  if (!currentEstimateId) currentEstimateId = generateId();
   const data = getEstimateData();
-  const key = 'domus_estimate_' + (data.projectInfo.quoteNo || 'draft');
-  localStorage.setItem(key, JSON.stringify(data));
-  localStorage.setItem('domus_estimate_last', key);
-  showToast('Estimate saved');
+  data.id = currentEstimateId;
+  try {
+    await db.saveEstimate(data);
+    await db.setMeta('lastEstimateId', currentEstimateId);
+    setSaveState('saved');
+    showToast('Estimate saved', 'success');
+  } catch(e) {
+    setSaveState('unsaved');
+    showToast('Save failed: ' + e.message, 'error');
+  }
 }
 
-function loadEstimate() {
-  const keys = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k.startsWith('domus_estimate_') && k !== 'domus_estimate_last') keys.push(k);
-  }
-  if (keys.length === 0) { showToast('No saved estimates found'); return; }
+async function showLoadModal() {
+  const estimates = await db.listEstimates();
+  if (estimates.length === 0) { showToast('No saved estimates', 'info'); return; }
 
-  const lastKey = localStorage.getItem('domus_estimate_last');
-  const key = lastKey && localStorage.getItem(lastKey) ? lastKey : keys[0];
+  document.getElementById('modalTitle').textContent = 'Load Estimate';
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:var(--sp-2)">
+      ${estimates.sort((a,b) => new Date(b.updated_at||0) - new Date(a.updated_at||0)).map(est => {
+        const pi = est.projectInfo || {};
+        const items = (est.lineItems || []).filter(i => !i.isSection).length;
+        const date = est.updated_at ? new Date(est.updated_at).toLocaleDateString() : '—';
+        return `<div class="version-item" onclick="doLoadEstimate('${est.id}');closeModal()" style="cursor:pointer">
+          <div>
+            <div style="font-weight:600;font-size:0.85rem">${escHtml(pi.projectDesc || pi.quoteNo || 'Untitled')}</div>
+            <div style="font-size:0.7rem;color:var(--text-muted)">${escHtml(pi.clientName||'')} · ${date} · ${items} items</div>
+          </div>
+          <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteEstimate('${est.id}')">Delete</button>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `<button class="btn" onclick="closeModal()">Close</button>`;
+  openModal();
+}
 
-  const data = JSON.parse(localStorage.getItem(key));
-  if (!data) { showToast('Failed to load estimate'); return; }
-
+async function doLoadEstimate(id) {
+  const data = await db.getEstimate(id);
+  if (!data) { showToast('Estimate not found', 'error'); return; }
   restoreEstimate(data);
-  showToast('Estimate loaded');
+  showToast('Estimate loaded', 'success');
+}
+
+async function deleteEstimate(id) {
+  if (!confirm('Delete this estimate?')) return;
+  await db.deleteEstimate(id);
+  showToast('Estimate deleted', 'info');
+  showLoadModal(); // refresh
 }
 
 function restoreEstimate(data) {
+  currentEstimateId = data.id || null;
   currentCompany = data.company || 'domus';
   document.getElementById('companySelect').value = currentCompany;
   if (data.markupRates) markupRates = data.markupRates;
-  if (data.companies) {
-    Object.keys(data.companies).forEach(k => {
-      if (COMPANIES[k]) COMPANIES[k].laborRate = data.companies[k].laborRate;
-    });
-  }
+  if (data.companies) Object.keys(data.companies).forEach(k => { if (COMPANIES[k]) COMPANIES[k].laborRate = data.companies[k].laborRate; });
+
   const pi = data.projectInfo || {};
   document.getElementById('supervisor').value = pi.supervisor || '';
   document.getElementById('projectDesc').value = pi.projectDesc || '';
@@ -1047,21 +2356,23 @@ function restoreEstimate(data) {
 
   lineItems = data.lineItems || [];
   scheduleItems = data.scheduleItems || [];
-  nextLineId = data.nextLineId || 1;
-  nextScheduleId = data.nextScheduleId || 1;
+  nextLineId = data.nextLineId || (Math.max(0, ...lineItems.map(i=>i.id), ...scheduleItems.map(s=>s.id)) + 1);
+  nextScheduleId = data.nextScheduleId || nextLineId;
+  currentVersion = data.version || 1;
+  document.getElementById('versionBadge').textContent = 'V' + currentVersion;
 
-  renderMarkupGrid();
-  renderBOQ();
-  renderSchedule();
-  recalcAll();
+  undoStack = []; redoStack = [];
+  renderMarkupGrid(); renderBOQ(); renderSchedule(); recalcAll();
+  setSaveState('saved');
 }
 
 function newEstimate() {
   if (lineItems.length > 0 && !confirm('Start a new estimate? Unsaved changes will be lost.')) return;
-  lineItems = [];
-  scheduleItems = [];
-  nextLineId = 1;
-  nextScheduleId = 1;
+  currentEstimateId = null;
+  lineItems = []; scheduleItems = [];
+  nextLineId = 1; nextScheduleId = 1; currentVersion = 1;
+  selectedRows.clear(); undoStack = []; redoStack = [];
+
   document.getElementById('supervisor').value = '';
   document.getElementById('projectDesc').value = '';
   document.getElementById('location').value = '';
@@ -1073,25 +2384,115 @@ function newEstimate() {
   document.getElementById('projectDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('duration').value = '35';
   document.getElementById('manualDiscount').value = '0';
+  document.getElementById('versionBadge').textContent = 'V1';
+
   initMarkupRates();
-  renderMarkupGrid();
-  renderBOQ();
-  renderSchedule();
-  recalcAll();
-  showToast('New estimate created');
+  renderMarkupGrid(); renderBOQ(); renderSchedule(); recalcAll();
+  setSaveState('saved');
+  showToast('New estimate created', 'success');
+}
+
+// ============================================================
+// SAVE STATE INDICATOR
+// ============================================================
+function setSaveState(state) {
+  saveState = state;
+  const dot = document.getElementById('saveDot');
+  const label = document.getElementById('saveLabel');
+  dot.className = 'save-dot' + (state === 'saving' ? ' saving' : state === 'unsaved' ? ' unsaved' : '');
+  label.textContent = state === 'saving' ? 'Saving...' : state === 'unsaved' ? 'Unsaved' : 'Saved';
+}
+
+function markUnsaved() { setSaveState('unsaved'); }
+
+// ============================================================
+// EXPORT
+// ============================================================
+function toggleExportMenu() {
+  const menu = document.getElementById('exportMenu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close export menu on outside click
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('exportMenu');
+  const btn = document.getElementById('exportBtn');
+  if (!menu.contains(e.target) && !btn.contains(e.target)) menu.style.display = 'none';
+});
+
+function exportExcel() {
+  if (typeof XLSX === 'undefined') { showToast('SheetJS not loaded yet — try again', 'warning'); return; }
+  const wb = XLSX.utils.book_new();
+  const rows = [['SL', 'Description', 'Unit', 'Qty', 'Rate (AED)', 'Total (AED)', 'Type', 'Markup %', 'Cost (AED)']];
+  const nums = getLineNumbers();
+  lineItems.forEach((item, idx) => {
+    if (item.isSection) { rows.push([nums[idx], item.description, '', '', '', '', '', '', '']); return; }
+    rows.push([nums[idx], item.description, item.unit, item.qty, +item.rate.toFixed(2), +item.total.toFixed(2), TRADE_TYPES.find(t=>t.key===item.type)?.label||'', +(item.finalMarkup*100).toFixed(1), +item.cost.toFixed(2)]);
+  });
+  rows.push([]);
+  const manualDiscount = parseFloat(document.getElementById('manualDiscount').value) || 0;
+  const totalPrice = lineItems.filter(i=>!i.isSection).reduce((a,i) => a + i.price, 0);
+  const discountedPrice = totalPrice * (1 - manualDiscount / 100);
+  const vat = discountedPrice * 0.05;
+  rows.push(['', 'Subtotal', '', '', '', +totalPrice.toFixed(2)]);
+  if (manualDiscount > 0) rows.push(['', `Discount (${manualDiscount}%)`, '', '', '', +((totalPrice - discountedPrice) * -1).toFixed(2)]);
+  rows.push(['', 'VAT (5%)', '', '', '', +vat.toFixed(2)]);
+  rows.push(['', 'TOTAL (incl. VAT)', '', '', '', +(discountedPrice + vat).toFixed(2)]);
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:8},{wch:40},{wch:8},{wch:8},{wch:14},{wch:14},{wch:16},{wch:10},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws, 'BOQ');
+  const quoteNo = document.getElementById('quoteNo').value || 'estimate';
+  XLSX.writeFile(wb, `${quoteNo}_domus.xlsx`);
+  showToast('Excel exported', 'success');
+  document.getElementById('exportMenu').style.display = 'none';
+}
+
+function exportJSON() {
+  const data = getEstimateData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${document.getElementById('quoteNo').value || 'estimate'}_domus.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('JSON exported', 'success');
+  document.getElementById('exportMenu').style.display = 'none';
+}
+
+function importJSON() {
+  document.getElementById('fileInput').click();
+  document.getElementById('exportMenu').style.display = 'none';
+}
+
+function handleFileImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.lineItems) throw new Error('Invalid estimate file');
+      restoreEstimate(data);
+      currentEstimateId = null; // treat as new
+      showToast('Estimate imported', 'success');
+    } catch(err) {
+      showToast('Import failed: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = ''; // reset
 }
 
 // ============================================================
 // PRINT
 // ============================================================
-
 function printEstimate() {
   const company = COMPANIES[currentCompany];
   document.getElementById('printCompanyName').textContent = company.name;
   document.getElementById('printCompanyRep').textContent = company.name;
   document.getElementById('printDuration').textContent = document.getElementById('duration').value || '35';
 
-  // Print info
   const pi = {
     'Quote No.': document.getElementById('quoteNo').value,
     'Variation No.': document.getElementById('variationNo').value,
@@ -1105,17 +2506,20 @@ function printEstimate() {
   };
   document.getElementById('printInfo').innerHTML = Object.entries(pi).map(([k,v]) => `<div><strong>${k}:</strong> ${v || '—'}</div>`).join('');
 
-  // Print BOQ table
-  let tableHtml = '<thead><tr><th>SL.</th><th>Description</th><th>Unit</th><th style="text-align:right">Qty</th><th style="text-align:right">Rate (AED)</th><th style="text-align:right">Total (AED)</th></tr></thead><tbody>';
+  const nums = getLineNumbers();
+  let tableHtml = '<thead><tr><th>No.</th><th>Description</th><th>Unit</th><th style="text-align:right">Qty</th><th style="text-align:right">Rate (AED)</th><th style="text-align:right">Total (AED)</th></tr></thead><tbody>';
   lineItems.forEach((item, idx) => {
-    tableHtml += `<tr><td>${idx+1}</td><td>${escHtml(item.description) || '—'}</td><td>${item.unit}</td><td class="num">${item.qty}</td><td class="num">${fmt(item.rate)}</td><td class="num">${fmt(item.total)}</td></tr>`;
+    if (item.isSection) {
+      tableHtml += `<tr class="section-header"><td colspan="6">${nums[idx]} — ${escHtml(item.description)}</td></tr>`;
+      return;
+    }
+    tableHtml += `<tr><td>${nums[idx]}</td><td>${escHtml(item.description)||'—'}</td><td>${item.unit}</td><td class="num">${item.qty}</td><td class="num">${fmt(item.rate)}</td><td class="num">${fmt(item.total)}</td></tr>`;
   });
   tableHtml += '</tbody>';
   document.getElementById('printBoqTable').innerHTML = tableHtml;
 
-  // Print summary
   const manualDiscount = parseFloat(document.getElementById('manualDiscount').value) || 0;
-  const totalPrice = lineItems.reduce((a, i) => a + i.price, 0);
+  const totalPrice = lineItems.filter(i=>!i.isSection).reduce((a,i) => a + i.price, 0);
   const discountedPrice = totalPrice * (1 - manualDiscount / 100);
   const vat = discountedPrice * 0.05;
   const grandTotal = discountedPrice + vat;
@@ -1130,44 +2534,83 @@ function printEstimate() {
   sumHtml += `<tr class="grand"><td><strong>Total (Incl. VAT)</strong></td><td><strong>AED ${fmt(grandTotal)}</strong></td></tr>`;
   sumHtml += '</table>';
   document.getElementById('printSummary').innerHTML = sumHtml;
-
   window.print();
 }
 
 // ============================================================
+// MODAL
+// ============================================================
+function openModal() { document.getElementById('modalBackdrop').classList.add('show'); }
+function closeModal() { document.getElementById('modalBackdrop').classList.remove('show'); }
+
+// ============================================================
 // TOAST
 // ============================================================
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  const iconPaths = {
+    success: '<circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/>',
+    error: '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+    warning: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'
+  };
+  toast.innerHTML = `<svg class="toast-icon ${type}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconPaths[type]||iconPaths.info}</svg><span>${escHtml(message)}</span>`;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 
 // ============================================================
-// INIT
+// KEYBOARD SHORTCUTS
 // ============================================================
+document.addEventListener('keydown', (e) => {
+  const ctrl = e.ctrlKey || e.metaKey;
+  if (ctrl && e.key === 's') { e.preventDefault(); saveEstimate(); }
+  else if (ctrl && e.key === 'n' && !e.shiftKey) { e.preventDefault(); addLineItem(); }
+  else if (ctrl && e.key === 'p') { e.preventDefault(); printEstimate(); }
+  else if (ctrl && e.key === 'd') { e.preventDefault(); duplicateSelected(); }
+  else if (ctrl && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+  else if (ctrl && e.key === 'z' && e.shiftKey) { e.preventDefault(); redo(); }
+  else if (ctrl && e.key === 'Z') { e.preventDefault(); redo(); }
+  else if (e.key === 'Escape') { closeModal(); document.getElementById('exportMenu').style.display = 'none'; }
+});
 
-function init() {
+// Export menu hover styling
+document.querySelectorAll('.export-option').forEach(el => {
+  el.addEventListener('mouseenter', () => el.style.background = 'var(--gray-50)');
+  el.addEventListener('mouseleave', () => el.style.background = 'transparent');
+});
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+async function init() {
   initMarkupRates();
   document.getElementById('projectDate').value = new Date().toISOString().split('T')[0];
   renderMarkupGrid();
   renderDiscountTiers(0);
   renderSchedule();
 
-  // Try loading last estimate
-  const lastKey = localStorage.getItem('domus_estimate_last');
-  if (lastKey && localStorage.getItem(lastKey)) {
-    try {
-      const data = JSON.parse(localStorage.getItem(lastKey));
-      restoreEstimate(data);
-      return;
-    } catch(e) {}
-  }
+  // Load templates
+  await loadTemplates();
 
-  // Add a default line item
+  // Try loading last estimate
+  try {
+    const lastId = await db.getMeta('lastEstimateId');
+    if (lastId) {
+      const data = await db.getEstimate(lastId);
+      if (data) { restoreEstimate(data); return; }
+    }
+  } catch(e) { console.warn('Failed to load last estimate:', e); }
+
+  // Default: add one line item
   addLineItem();
+  setSaveState('saved');
 }
 
 init();
