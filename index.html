@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estimate Calculator — Domus Interior Contracting</title>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --border: #e2e5e9;
+  --border-light: #f0f1f3;
+  --text: #1a1d21;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #eff6ff;
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
+  --success: #059669;
+  --success-light: #ecfdf5;
+  --warning: #d97706;
+  --warning-light: #fffbeb;
+  --radius: 8px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; }
+input, select, button, textarea { font-family: inherit; font-size: inherit; }
+input[type="number"] { -moz-appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Layout */
+.app-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.app-header h1 { font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.app-header h1 svg { width: 22px; height: 22px; color: var(--primary); }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; }
+.tab { padding: 10px 20px; cursor: pointer; font-weight: 500; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: all 0.15s; user-select: none; }
+.tab:hover { color: var(--text); background: var(--bg); }
+.tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Cards */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+.card-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+.card-title svg { width: 16px; height: 16px; }
+
+/* Form Grid */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); }
+.form-group input, .form-group select, .form-group textarea {
+  padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); transition: border-color 0.15s; outline: none;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+.form-group.span-2 { grid-column: span 2; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius-sm); font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.15s; white-space: nowrap; }
+.btn:hover { background: var(--bg); }
+.btn svg { width: 15px; height: 15px; }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-danger { color: var(--danger); border-color: var(--danger); background: var(--danger-light); }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+.btn-sm { padding: 4px 10px; font-size: 0.85rem; }
+.btn-icon { padding: 5px; border: none; background: none; cursor: pointer; color: var(--text-muted); border-radius: 4px; }
+.btn-icon:hover { background: var(--bg); color: var(--text); }
+
+/* BOQ Table */
+.boq-table { width: 100%; border-collapse: collapse; }
+.boq-table th { background: var(--bg); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--border); position: sticky; top: 54px; z-index: 10; }
+.boq-table th.num, .boq-table td.num { text-align: right; }
+.boq-row td { padding: 6px 10px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.boq-row:hover { background: var(--primary-light); }
+.boq-row td input, .boq-row td select {
+  width: 100%; padding: 5px 8px; border: 1px solid transparent; border-radius: 4px;
+  background: transparent; transition: all 0.15s;
+}
+.boq-row td input:hover, .boq-row td select:hover { border-color: var(--border); background: var(--surface); }
+.boq-row td input:focus, .boq-row td select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 2px rgba(37,99,235,0.1); outline: none; }
+.boq-row td .calc-value { font-family: var(--mono); font-size: 0.9rem; color: var(--text); padding: 5px 8px; }
+.boq-row td .calc-value.total { font-weight: 600; color: var(--primary); }
+
+/* Sub-item panel */
+.sub-panel { background: #fafbfc; border-bottom: 1px solid var(--border); }
+.sub-panel td { padding: 0 !important; }
+.sub-panel-inner { padding: 12px 16px 12px 48px; }
+.sub-item { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); align-items: start; }
+.sub-item:last-child { border-bottom: none; }
+.sub-item-section { display: flex; flex-direction: column; gap: 6px; }
+.sub-item-section h5 { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.sub-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; }
+.sub-field { display: flex; flex-direction: column; gap: 2px; }
+.sub-field label { font-size: 0.7rem; color: var(--text-muted); }
+.sub-field input { padding: 4px 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem; width: 100%; background: var(--surface); }
+.sub-field input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+.sub-field .sub-total { font-family: var(--mono); font-weight: 600; font-size: 0.85rem; padding: 4px 6px; }
+.sub-item-total { font-family: var(--mono); font-weight: 600; font-size: 0.95rem; color: var(--primary); padding-top: 20px; text-align: right; min-width: 100px; }
+.sub-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* Expand toggle */
+.expand-toggle { cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 4px; transition: all 0.15s; }
+.expand-toggle:hover { background: var(--bg); }
+.expand-toggle svg { width: 14px; height: 14px; color: var(--text-muted); transition: transform 0.2s; }
+.expand-toggle.open svg { transform: rotate(90deg); }
+
+/* Summary Card */
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-light); }
+.summary-row:last-child { border-bottom: none; }
+.summary-label { font-weight: 500; color: var(--text-secondary); }
+.summary-value { font-family: var(--mono); font-weight: 600; font-size: 1rem; }
+.summary-value.highlight { color: var(--primary); font-size: 1.15rem; }
+.summary-divider { grid-column: span 2; border-top: 2px solid var(--border); margin: 4px 0; }
+.summary-grand { background: var(--primary-light); border-radius: var(--radius); padding: 16px; }
+.summary-grand .summary-value { color: var(--primary); font-size: 1.3rem; }
+
+/* Settings */
+.markup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.markup-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); }
+.markup-item label { font-size: 0.85rem; }
+.markup-item input { width: 60px; text-align: right; padding: 3px 6px; border: 1px solid var(--border); border-radius: 4px; }
+.discount-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 6px; }
+.discount-item { display: flex; justify-content: space-between; padding: 5px 10px; font-size: 0.85rem; border-radius: 4px; }
+.discount-item.active { background: var(--primary-light); font-weight: 600; }
+
+/* Company selector */
+.company-select { display: flex; align-items: center; gap: 8px; }
+.company-select select { padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-weight: 500; background: var(--surface); }
+
+/* Toast */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: #fff; padding: 10px 18px; border-radius: var(--radius); font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 1000; }
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* Print Styles */
+@media print {
+  body { background: #fff; font-size: 11pt; }
+  .app-header, .tabs, .no-print, .btn, .expand-toggle, .sub-panel, .boq-table th.no-print, .boq-table td.no-print { display: none !important; }
+  .container { max-width: 100%; padding: 0; margin: 0; }
+  .card { border: none; padding: 0; margin-bottom: 12pt; box-shadow: none; }
+  .print-header { display: block !important; text-align: center; margin-bottom: 20pt; padding-bottom: 12pt; border-bottom: 2px solid #000; }
+  .print-header h2 { font-size: 16pt; margin-bottom: 4pt; }
+  .print-header p { font-size: 10pt; color: #555; }
+  .print-info { display: grid !important; grid-template-columns: 1fr 1fr; gap: 4pt; font-size: 10pt; margin-bottom: 16pt; }
+  .print-info div { padding: 2pt 0; }
+  .print-info strong { min-width: 100pt; display: inline-block; }
+  .print-boq { width: 100%; border-collapse: collapse; margin-bottom: 16pt; }
+  .print-boq th { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 6pt 8pt; border: 1px solid #ccc; font-size: 9pt; text-transform: uppercase; }
+  .print-boq td { padding: 5pt 8pt; border: 1px solid #ddd; font-size: 10pt; }
+  .print-boq td.num { text-align: right; font-family: var(--mono); }
+  .print-summary { margin-top: 12pt; }
+  .print-summary table { width: 50%; margin-left: auto; border-collapse: collapse; }
+  .print-summary td { padding: 4pt 8pt; font-size: 10pt; }
+  .print-summary td:last-child { text-align: right; font-family: var(--mono); font-weight: 600; }
+  .print-summary .grand { font-size: 12pt; border-top: 2px solid #000; }
+  .print-footer { margin-top: 30pt; font-size: 9pt; color: #555; }
+  .print-footer .notes { margin-bottom: 16pt; }
+  .print-footer .notes p { margin-bottom: 4pt; }
+  .print-signatures { display: grid !important; grid-template-columns: 1fr 1fr; gap: 40pt; margin-top: 40pt; }
+  .print-signatures .sig-block { border-top: 1px solid #000; padding-top: 8pt; font-size: 10pt; }
+  .tab-content { display: block !important; }
+  #tab-boq { display: block !important; }
+  #tab-schedule, #tab-settings { display: none !important; }
+  #printView { display: block !important; }
+  #appView { display: none !important; }
+}
+.print-header, .print-info, .print-signatures { display: none; }
+#printView { display: none; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Item Schedule */
+.schedule-link { font-size: 0.75rem; color: var(--primary); cursor: pointer; text-decoration: underline; }
+.schedule-item { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.schedule-item h4 { margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.boq-row { animation: fadeIn 0.2s ease; }
+</style>
+</head>
+<body>
+
+<!-- App Header -->
+<header class="app-header">
+  <h1>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Estimate Calculator
+  </h1>
+  <div class="header-actions">
+    <div class="company-select">
+      <select id="companySelect" onchange="changeCompany()">
+        <option value="domus">Domus Interior Contracting L.L.C</option>
+        <option value="ng">NG Contracting</option>
+        <option value="phoenix">Phoenix Contracting</option>
+        <option value="nomos">Nomos Interior</option>
+        <option value="telos">Telos Projects</option>
+      </select>
+    </div>
+    <button class="btn btn-sm" onclick="saveEstimate()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1-2 2h11l5 5v11z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save
+    </button>
+    <button class="btn btn-sm" onclick="loadEstimate()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Load
+    </button>
+    <button class="btn btn-sm" onclick="newEstimate()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      New
+    </button>
+    <button class="btn btn-primary btn-sm" onclick="printEstimate()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print / PDF
+    </button>
+  </div>
+</header>
+
+<div id="appView">
+<div class="container">
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="boq" onclick="switchTab('boq')">
+      <svg style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Bill of Quantities
+    </div>
+    <div class="tab" data-tab="schedule" onclick="switchTab('schedule')">
+      <svg style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Item Schedule
+    </div>
+    <div class="tab" data-tab="settings" onclick="switchTab('settings')">
+      <svg style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </div>
+  </div>
+
+  <!-- BOQ Tab -->
+  <div id="tab-boq" class="tab-content active">
+    <!-- Project Info -->
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Project Information
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Supervisor</label><input type="text" id="supervisor" placeholder="Supervisor name"></div>
+        <div class="form-group span-2"><label>Project Description</label><input type="text" id="projectDesc" placeholder="Brief project description"></div>
+        <div class="form-group"><label>Location</label><input type="text" id="location" placeholder="Property / Area / Street"></div>
+        <div class="form-group"><label>Client Name</label><input type="text" id="clientName" placeholder="Client full name"></div>
+        <div class="form-group"><label>Client Email</label><input type="email" id="clientEmail" placeholder="client@email.com"></div>
+        <div class="form-group"><label>Quote No.</label><input type="text" id="quoteNo" placeholder="Q-001"></div>
+        <div class="form-group"><label>Variation No.</label><input type="text" id="variationNo" placeholder="0" value="0"></div>
+        <div class="form-group"><label>Project No.</label><input type="text" id="projectNo" placeholder="P-001"></div>
+        <div class="form-group"><label>Date</label><input type="date" id="projectDate"></div>
+        <div class="form-group"><label>Est. Duration (days)</label><input type="number" id="duration" value="35" min="1"></div>
+      </div>
+      <p style="margin-top:10px; font-size:0.8rem; color:var(--text-muted); font-style:italic;">This estimation is valid for 14 days from the date hereof.</p>
+    </div>
+
+    <!-- BOQ Table -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);">
+        <div class="card-title" style="margin-bottom: 0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Bill of Quantities
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addLineItem()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Item
+        </button>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="boq-table">
+          <thead>
+            <tr>
+              <th style="width:30px"></th>
+              <th style="width:50px">SL.</th>
+              <th style="min-width:200px">Description</th>
+              <th style="width:80px">Unit</th>
+              <th style="width:80px" class="num">Qty</th>
+              <th style="width:100px" class="num">Rate (AED)</th>
+              <th style="width:120px" class="num">Total (AED)</th>
+              <th style="width:140px" class="no-print">Type</th>
+              <th style="width:70px" class="num no-print">Markup</th>
+              <th style="width:100px" class="num no-print">Cost</th>
+              <th style="width:40px" class="no-print"></th>
+            </tr>
+          </thead>
+          <tbody id="boqBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card" id="summaryCard">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Summary
+      </div>
+      <div class="summary-grid">
+        <div>
+          <div class="summary-row"><span class="summary-label">Total Domus Cost</span><span class="summary-value" id="sumDomusCost">0.00</span></div>
+          <div class="summary-row"><span class="summary-label">Total Subcontractor Cost</span><span class="summary-value" id="sumSubCost">0.00</span></div>
+          <div class="summary-row"><span class="summary-label">Total Project Cost</span><span class="summary-value" id="sumTotalCost">0.00</span></div>
+          <div class="summary-row"><span class="summary-label">Value Discount Tier</span><span class="summary-value" id="sumDiscountTier">0%</span></div>
+        </div>
+        <div>
+          <div class="summary-row"><span class="summary-label">Weighted Avg. Markup</span><span class="summary-value" id="sumAvgMarkup">0.00%</span></div>
+          <div class="summary-row"><span class="summary-label">Final Weighted Markup (after discount)</span><span class="summary-value" id="sumFinalMarkup">0.00%</span></div>
+          <div class="summary-row"><span class="summary-label">Total Project Price (Before VAT)</span><span class="summary-value highlight" id="sumPriceBeforeVAT">0.00</span></div>
+          <div class="summary-row">
+            <span class="summary-label">Manual Discount %</span>
+            <span><input type="number" id="manualDiscount" value="0" min="0" max="100" step="0.5" style="width:70px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;text-align:right;font-family:var(--mono)" onchange="recalcAll()" oninput="recalcAll()"></span>
+          </div>
+        </div>
+        <div class="summary-divider"></div>
+        <div>
+          <div class="summary-row"><span class="summary-label">Discounted Price</span><span class="summary-value" id="sumDiscPrice">0.00</span></div>
+          <div class="summary-row"><span class="summary-label">VAT (5%)</span><span class="summary-value" id="sumVAT">0.00</span></div>
+        </div>
+        <div class="summary-grand">
+          <div class="summary-row"><span class="summary-label" style="font-size:1.05rem;font-weight:600">Total Inclusive of VAT</span><span class="summary-value highlight" id="sumGrandTotal" style="font-size:1.4rem">AED 0.00</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Item Schedule Tab -->
+  <div id="tab-schedule" class="tab-content">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Item Schedule — Extended Breakdown
+      </div>
+      <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">For complex items requiring more than 3 sub-items. Link to a BOQ line item and add unlimited sub-items.</p>
+      <div id="scheduleItems"></div>
+      <button class="btn btn-sm" onclick="addScheduleItem()" style="margin-top:12px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Schedule Item
+      </button>
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div id="tab-settings" class="tab-content">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        Trade Markup Rates
+      </div>
+      <div class="markup-grid" id="markupGrid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Value Discount Tiers (Applied to Markup)
+      </div>
+      <div class="discount-grid" id="discountGrid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Company Settings
+      </div>
+      <div class="form-grid" style="max-width:400px">
+        <div class="form-group">
+          <label>Default Labor Rate (AED/hr)</label>
+          <input type="number" id="defaultLaborRate" value="17" min="1" step="0.5" onchange="updateLaborRate()">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Print View -->
+<div id="printView">
+  <div class="print-header">
+    <h2 id="printCompanyName">Domus Interior Contracting L.L.C</h2>
+    <p>Estimation / Quotation</p>
+  </div>
+  <div class="print-info" id="printInfo"></div>
+  <table class="print-boq" id="printBoqTable"></table>
+  <div class="print-summary" id="printSummary"></div>
+  <div class="print-footer">
+    <div class="notes">
+      <p><strong>Estimated Duration:</strong> <span id="printDuration">35</span> days</p>
+      <p><em>This estimation is valid for 14 days from the date hereof.</em></p>
+      <p style="margin-top:8pt"><em>This is a provisional BOQ, it's re-measurable and can change during the project. All variations that may occur will be quoted for separately.</em></p>
+      <p><em>Approval of the Estimation / Quotation is construed as approval of the attached Terms and Conditions.</em></p>
+    </div>
+    <div class="print-signatures">
+      <div class="sig-block">
+        <p>For, <span id="printCompanyRep">Domus Interior Contracting L.L.C</span> Representative</p>
+        <p style="margin-top:4pt">Name: ____________________</p>
+        <p>Signature: ____________________</p>
+        <p>Date: ____________________</p>
+      </div>
+      <div class="sig-block">
+        <p>For, Client</p>
+        <p style="margin-top:4pt">Name: ____________________</p>
+        <p>Signature: ____________________</p>
+        <p>Date: ____________________</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA MODEL
+// ============================================================
+
+const COMPANIES = {
+  domus: { name: 'Domus Interior Contracting L.L.C', laborRate: 17 },
+  ng: { name: 'NG Contracting', laborRate: 17 },
+  phoenix: { name: 'Phoenix Contracting', laborRate: 18 },
+  nomos: { name: 'Nomos Interior', laborRate: 17 },
+  telos: { name: 'Telos Projects', laborRate: 16 }
+};
+
+const TRADE_TYPES = [
+  { key: 'base_works', label: 'Base Works', markup: 0.40 },
+  { key: 'furniture', label: 'Furniture', markup: 0.40 },
+  { key: 'hvac', label: 'HVAC', markup: 0.35 },
+  { key: 'mep', label: 'MEP', markup: 0.35 },
+  { key: 'marble', label: 'Marble', markup: 0.35 },
+  { key: 'joinery', label: 'Joinery', markup: 0.35 },
+  { key: 'waterproofing', label: 'Waterproofing', markup: 0.35 },
+  { key: 'light_carpentry', label: 'Light Carpentry', markup: 0.30 },
+  { key: 'steel_works', label: 'Steel Works', markup: 0.30 },
+  { key: 'aluminium_works', label: 'Aluminium Works', markup: 0.30 },
+  { key: 'glass', label: 'Glass', markup: 0.30 },
+  { key: 'painting', label: 'Painting', markup: 0.25 },
+  { key: 'civil_works', label: 'Civil Works', markup: 0.25 },
+  { key: 'masonry', label: 'Masonry', markup: 0.25 },
+  { key: 'subcontracted', label: 'Subcontracted', markup: 0.15 },
+  { key: 'preliminary', label: 'Preliminary', markup: 0.10 },
+  { key: 'demolition', label: 'Demolition', markup: 0.10 }
+];
+
+const DISCOUNT_TIERS = [
+  { min: 0, max: 9999, discount: 0 },
+  { min: 10000, max: 24999, discount: 0.05 },
+  { min: 25000, max: 49999, discount: 0.10 },
+  { min: 50000, max: 99999, discount: 0.20 },
+  { min: 100000, max: 499999, discount: 0.30 },
+  { min: 500000, max: 999999, discount: 0.40 },
+  { min: 1000000, max: 2499999, discount: 0.50 },
+  { min: 2500000, max: Infinity, discount: 0.60 }
+];
+
+const UNITS = ['M2','M','LM','Item','Lot','No.','Set','Kg','L','CM','MM','Pair','Roll','Sheet','Box','Bag','Trip','Day','Hr'];
+
+let currentCompany = 'domus';
+let markupRates = {};
+let lineItems = [];
+let scheduleItems = [];
+let nextLineId = 1;
+let nextScheduleId = 1;
+
+// Initialize markup rates from defaults
+function initMarkupRates() {
+  TRADE_TYPES.forEach(t => { markupRates[t.key] = t.markup; });
+}
+
+// ============================================================
+// CORE CALCULATIONS
+// ============================================================
+
+function getMarkupRate(typeKey) {
+  return markupRates[typeKey] || 0;
+}
+
+function getValueDiscount(totalProjectCost) {
+  for (let i = DISCOUNT_TIERS.length - 1; i >= 0; i--) {
+    if (totalProjectCost >= DISCOUNT_TIERS[i].min) return DISCOUNT_TIERS[i].discount;
+  }
+  return 0;
+}
+
+function calcSubItem(sub) {
+  const matSubtotal = (sub.matRate || 0) * (sub.matQty || 0);
+  const laborSubtotal = (sub.laborRate || 0) * (sub.laborEmployees || 0) * (sub.laborHours || 0) * (sub.laborDays || 0);
+  sub.matSubtotal = matSubtotal;
+  sub.laborSubtotal = laborSubtotal;
+  sub.total = matSubtotal + laborSubtotal;
+  return sub.total;
+}
+
+function calcLineItem(item, valueDiscount) {
+  // Sum sub-item costs
+  let cost = 0;
+  item.subItems.forEach(sub => { cost += calcSubItem(sub); });
+
+  // Add schedule item cost if linked
+  const linked = scheduleItems.filter(s => s.linkedLineId === item.id);
+  linked.forEach(sch => {
+    let schCost = 0;
+    sch.subItems.forEach(sub => { schCost += calcSubItem(sub); });
+    sch.total = schCost;
+    cost += schCost;
+  });
+
+  item.cost = cost;
+  const baseMarkup = getMarkupRate(item.type);
+  item.baseMarkup = baseMarkup;
+  item.markupDiscount = valueDiscount;
+  item.finalMarkup = baseMarkup * (1 - valueDiscount);
+  item.price = cost * (1 + item.finalMarkup);
+  item.rate = item.qty > 0 ? item.price / item.qty : 0;
+  item.total = item.price;
+  return item;
+}
+
+function recalcAll() {
+  // Step 1: compute all costs first (without discount) to get total project cost
+  let totalCost = 0;
+  lineItems.forEach(item => {
+    let cost = 0;
+    item.subItems.forEach(sub => { cost += calcSubItem(sub); });
+    const linked = scheduleItems.filter(s => s.linkedLineId === item.id);
+    linked.forEach(sch => {
+      let schCost = 0;
+      sch.subItems.forEach(sub => { schCost += calcSubItem(sub); });
+      sch.total = schCost;
+      cost += schCost;
+    });
+    item.cost = cost;
+    totalCost += cost;
+  });
+
+  // Step 2: get value discount from total cost
+  const valueDiscount = getValueDiscount(totalCost);
+
+  // Step 3: compute final prices with discount
+  let domusCost = 0, subCost = 0;
+  let totalPrice = 0;
+  let weightedMarkupNum = 0, weightedMarkupDen = 0;
+  let finalWeightedNum = 0;
+
+  lineItems.forEach(item => {
+    calcLineItem(item, valueDiscount);
+    if (item.type === 'subcontracted') {
+      subCost += item.cost;
+    } else {
+      domusCost += item.cost;
+    }
+    totalPrice += item.price;
+    if (item.cost > 0) {
+      weightedMarkupNum += item.baseMarkup * item.cost;
+      finalWeightedNum += item.finalMarkup * item.cost;
+      weightedMarkupDen += item.cost;
+    }
+  });
+
+  const weightedAvgMarkup = weightedMarkupDen > 0 ? weightedMarkupNum / weightedMarkupDen : 0;
+  const finalWeightedMarkup = weightedMarkupDen > 0 ? finalWeightedNum / weightedMarkupDen : 0;
+
+  const manualDiscount = parseFloat(document.getElementById('manualDiscount').value) || 0;
+  const discountedPrice = totalPrice * (1 - manualDiscount / 100);
+  const vat = discountedPrice * 0.05;
+  const grandTotal = discountedPrice + vat;
+
+  // Update summary
+  document.getElementById('sumDomusCost').textContent = fmt(domusCost);
+  document.getElementById('sumSubCost').textContent = fmt(subCost);
+  document.getElementById('sumTotalCost').textContent = fmt(totalCost);
+  document.getElementById('sumDiscountTier').textContent = (valueDiscount * 100).toFixed(0) + '%';
+  document.getElementById('sumAvgMarkup').textContent = (weightedAvgMarkup * 100).toFixed(2) + '%';
+  document.getElementById('sumFinalMarkup').textContent = (finalWeightedMarkup * 100).toFixed(2) + '%';
+  document.getElementById('sumPriceBeforeVAT').textContent = fmt(totalPrice);
+  document.getElementById('sumDiscPrice').textContent = fmt(discountedPrice);
+  document.getElementById('sumVAT').textContent = fmt(vat);
+  document.getElementById('sumGrandTotal').textContent = 'AED ' + fmt(grandTotal);
+
+  // Update discount tier highlight in settings
+  renderDiscountTiers(totalCost);
+
+  // Update BOQ table calculated values
+  lineItems.forEach(item => {
+    const row = document.querySelector(`[data-line-id="${item.id}"]`);
+    if (!row) return;
+    row.querySelector('.calc-rate').textContent = fmt(item.rate);
+    row.querySelector('.calc-total').textContent = fmt(item.total);
+    row.querySelector('.calc-markup').textContent = (item.finalMarkup * 100).toFixed(1) + '%';
+    row.querySelector('.calc-cost').textContent = fmt(item.cost);
+    // Update sub-item totals
+    updateSubItemDisplay(item);
+  });
+}
+
+// ============================================================
+// FORMATTING
+// ============================================================
+
+function fmt(n) {
+  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ============================================================
+// UI RENDERING
+// ============================================================
+
+function createSubItem(laborRate) {
+  return {
+    matRate: 0, matUnit: 'Item', matQty: 0, matSubtotal: 0,
+    laborRate: laborRate || COMPANIES[currentCompany].laborRate,
+    laborEmployees: 0, laborHours: 0, laborDays: 0,
+    laborSubtotal: 0, total: 0
+  };
+}
+
+function addLineItem() {
+  const item = {
+    id: nextLineId++,
+    description: '',
+    unit: 'Item',
+    qty: 1,
+    type: 'base_works',
+    subItems: [createSubItem()],
+    expanded: false,
+    cost: 0, baseMarkup: 0.40, markupDiscount: 0, finalMarkup: 0.40, price: 0, rate: 0, total: 0
+  };
+  lineItems.push(item);
+  renderBOQ();
+  recalcAll();
+}
+
+function removeLineItem(id) {
+  lineItems = lineItems.filter(i => i.id !== id);
+  // Unlink schedule items
+  scheduleItems.forEach(s => { if (s.linkedLineId === id) s.linkedLineId = null; });
+  renderBOQ();
+  recalcAll();
+}
+
+function toggleExpand(id) {
+  const item = lineItems.find(i => i.id === id);
+  if (!item) return;
+  item.expanded = !item.expanded;
+  renderBOQ();
+  recalcAll();
+}
+
+function addSubItem(lineId) {
+  const item = lineItems.find(i => i.id === lineId);
+  if (!item || item.subItems.length >= 3) return;
+  item.subItems.push(createSubItem());
+  renderBOQ();
+  recalcAll();
+}
+
+function removeSubItem(lineId, subIdx) {
+  const item = lineItems.find(i => i.id === lineId);
+  if (!item || item.subItems.length <= 1) return;
+  item.subItems.splice(subIdx, 1);
+  renderBOQ();
+  recalcAll();
+}
+
+function renderBOQ() {
+  const tbody = document.getElementById('boqBody');
+  tbody.innerHTML = '';
+
+  lineItems.forEach((item, idx) => {
+    // Main row
+    const tr = document.createElement('tr');
+    tr.className = 'boq-row';
+    tr.setAttribute('data-line-id', item.id);
+
+    const chevron = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+    tr.innerHTML = `
+      <td><div class="expand-toggle ${item.expanded ? 'open' : ''}" onclick="toggleExpand(${item.id})">${chevron}</div></td>
+      <td style="font-weight:600;color:var(--text-secondary)">${idx + 1}</td>
+      <td><input type="text" value="${escHtml(item.description)}" placeholder="Item description..." onchange="updateField(${item.id},'description',this.value)"></td>
+      <td><select onchange="updateField(${item.id},'unit',this.value)">${UNITS.map(u => `<option value="${u}" ${item.unit === u ? 'selected' : ''}>${u}</option>`).join('')}</select></td>
+      <td class="num"><input type="number" value="${item.qty}" min="0" step="any" style="text-align:right" onchange="updateField(${item.id},'qty',parseFloat(this.value)||0)" oninput="updateField(${item.id},'qty',parseFloat(this.value)||0)"></td>
+      <td class="num"><span class="calc-value calc-rate">${fmt(item.rate)}</span></td>
+      <td class="num"><span class="calc-value total calc-total">${fmt(item.total)}</span></td>
+      <td class="no-print"><select onchange="updateField(${item.id},'type',this.value)">${TRADE_TYPES.map(t => `<option value="${t.key}" ${item.type === t.key ? 'selected' : ''}>${t.label}</option>`).join('')}</select></td>
+      <td class="num no-print"><span class="calc-value calc-markup">${(item.finalMarkup * 100).toFixed(1)}%</span></td>
+      <td class="num no-print"><span class="calc-value calc-cost">${fmt(item.cost)}</span></td>
+      <td class="no-print"><button class="btn-icon" onclick="removeLineItem(${item.id})" title="Delete item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
+    `;
+    tbody.appendChild(tr);
+
+    // Sub-item panel
+    if (item.expanded) {
+      const subTr = document.createElement('tr');
+      subTr.className = 'sub-panel';
+      const subTd = document.createElement('td');
+      subTd.colSpan = 11;
+      let subHtml = '<div class="sub-panel-inner">';
+
+      item.subItems.forEach((sub, si) => {
+        subHtml += `
+        <div class="sub-item">
+          <div class="sub-item-section">
+            <h5>Material — Sub-item ${si + 1}</h5>
+            <div class="sub-fields">
+              <div class="sub-field"><label>Rate (AED)</label><input type="number" value="${sub.matRate}" min="0" step="any" onchange="updateSub(${item.id},${si},'matRate',this.value)" oninput="updateSub(${item.id},${si},'matRate',this.value)"></div>
+              <div class="sub-field"><label>Qty</label><input type="number" value="${sub.matQty}" min="0" step="any" onchange="updateSub(${item.id},${si},'matQty',this.value)" oninput="updateSub(${item.id},${si},'matQty',this.value)"></div>
+              <div class="sub-field"><label>Subtotal</label><div class="sub-total" id="matSub_${item.id}_${si}">${fmt(sub.matSubtotal)}</div></div>
+            </div>
+          </div>
+          <div class="sub-item-section">
+            <h5>Labor — Sub-item ${si + 1}</h5>
+            <div class="sub-fields">
+              <div class="sub-field"><label>Rate/hr</label><input type="number" value="${sub.laborRate}" min="0" step="any" onchange="updateSub(${item.id},${si},'laborRate',this.value)" oninput="updateSub(${item.id},${si},'laborRate',this.value)"></div>
+              <div class="sub-field"><label>Employees</label><input type="number" value="${sub.laborEmployees}" min="0" step="1" onchange="updateSub(${item.id},${si},'laborEmployees',this.value)" oninput="updateSub(${item.id},${si},'laborEmployees',this.value)"></div>
+              <div class="sub-field"><label>Hours</label><input type="number" value="${sub.laborHours}" min="0" step="any" onchange="updateSub(${item.id},${si},'laborHours',this.value)" oninput="updateSub(${item.id},${si},'laborHours',this.value)"></div>
+              <div class="sub-field"><label>Days</label><input type="number" value="${sub.laborDays}" min="0" step="any" onchange="updateSub(${item.id},${si},'laborDays',this.value)" oninput="updateSub(${item.id},${si},'laborDays',this.value)"></div>
+              <div class="sub-field"><label>Subtotal</label><div class="sub-total" id="labSub_${item.id}_${si}">${fmt(sub.laborSubtotal)}</div></div>
+            </div>
+          </div>
+          <div class="sub-item-total" id="subTotal_${item.id}_${si}">
+            ${fmt(sub.total)}
+            ${item.subItems.length > 1 ? `<br><button class="btn-icon" onclick="removeSubItem(${item.id},${si})" style="margin-top:4px" title="Remove sub-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+          </div>
+        </div>`;
+      });
+
+      const linkedSchedules = scheduleItems.filter(s => s.linkedLineId === item.id);
+      if (linkedSchedules.length > 0) {
+        subHtml += `<div style="margin-top:8px;padding:6px 10px;background:var(--primary-light);border-radius:4px;font-size:0.8rem;color:var(--primary)">
+          <strong>+ ${linkedSchedules.length} schedule item(s) linked</strong> — total: AED ${fmt(linkedSchedules.reduce((a,s) => a + (s.total||0), 0))}
+        </div>`;
+      }
+
+      subHtml += `<div class="sub-actions">`;
+      if (item.subItems.length < 3) {
+        subHtml += `<button class="btn btn-sm" onclick="addSubItem(${item.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Sub-item</button>`;
+      }
+      subHtml += `<span class="schedule-link" onclick="linkScheduleItem(${item.id})">+ Add to Item Schedule (unlimited sub-items)</span>`;
+      subHtml += `</div></div>`;
+
+      subTd.innerHTML = subHtml;
+      subTr.appendChild(subTd);
+      tbody.appendChild(subTr);
+    }
+  });
+}
+
+function updateSubItemDisplay(item) {
+  item.subItems.forEach((sub, si) => {
+    const matEl = document.getElementById(`matSub_${item.id}_${si}`);
+    const labEl = document.getElementById(`labSub_${item.id}_${si}`);
+    const totEl = document.getElementById(`subTotal_${item.id}_${si}`);
+    if (matEl) matEl.textContent = fmt(sub.matSubtotal);
+    if (labEl) labEl.textContent = fmt(sub.laborSubtotal);
+    if (totEl) {
+      // Keep the remove button if present
+      const btn = totEl.querySelector('button');
+      totEl.childNodes[0].textContent = fmt(sub.total);
+    }
+  });
+}
+
+function updateField(id, field, value) {
+  const item = lineItems.find(i => i.id === id);
+  if (!item) return;
+  item[field] = value;
+  recalcAll();
+}
+
+function updateSub(lineId, subIdx, field, value) {
+  const item = lineItems.find(i => i.id === lineId);
+  if (!item) return;
+  item.subItems[subIdx][field] = parseFloat(value) || 0;
+  recalcAll();
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+// ============================================================
+// SETTINGS RENDERING
+// ============================================================
+
+function renderMarkupGrid() {
+  const grid = document.getElementById('markupGrid');
+  grid.innerHTML = TRADE_TYPES.map(t => `
+    <div class="markup-item">
+      <label>${t.label}</label>
+      <input type="number" value="${(markupRates[t.key] * 100).toFixed(0)}" min="0" max="100" step="1" 
+        onchange="markupRates['${t.key}'] = parseFloat(this.value)/100; recalcAll()" 
+        style="font-family:var(--mono)"> <span style="font-size:0.8rem;color:var(--text-muted)">%</span>
+    </div>
+  `).join('');
+}
+
+function renderDiscountTiers(totalCost) {
+  const grid = document.getElementById('discountGrid');
+  grid.innerHTML = DISCOUNT_TIERS.map(t => {
+    const active = totalCost >= t.min && totalCost <= t.max;
+    const maxLabel = t.max === Infinity ? '+' : fmt(t.max);
+    return `<div class="discount-item ${active ? 'active' : ''}">
+      <span>AED ${fmt(t.min)}${t.max === Infinity ? '+' : ' — ' + fmt(t.max)}</span>
+      <span>${(t.discount * 100).toFixed(0)}% discount</span>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// ITEM SCHEDULE
+// ============================================================
+
+function addScheduleItem(linkedLineId) {
+  const sch = {
+    id: nextScheduleId++,
+    linkedLineId: linkedLineId || null,
+    description: '',
+    subItems: [createSubItem()],
+    total: 0
+  };
+  scheduleItems.push(sch);
+  renderSchedule();
+  recalcAll();
+}
+
+function linkScheduleItem(lineId) {
+  addScheduleItem(lineId);
+  switchTab('schedule');
+}
+
+function removeScheduleItem(id) {
+  scheduleItems = scheduleItems.filter(s => s.id !== id);
+  renderSchedule();
+  recalcAll();
+}
+
+function addScheduleSubItem(schId) {
+  const sch = scheduleItems.find(s => s.id === schId);
+  if (!sch) return;
+  sch.subItems.push(createSubItem());
+  renderSchedule();
+  recalcAll();
+}
+
+function removeScheduleSubItem(schId, subIdx) {
+  const sch = scheduleItems.find(s => s.id === schId);
+  if (!sch || sch.subItems.length <= 1) return;
+  sch.subItems.splice(subIdx, 1);
+  renderSchedule();
+  recalcAll();
+}
+
+function updateScheduleField(schId, field, value) {
+  const sch = scheduleItems.find(s => s.id === schId);
+  if (!sch) return;
+  sch[field] = value;
+  recalcAll();
+}
+
+function updateScheduleSub(schId, subIdx, field, value) {
+  const sch = scheduleItems.find(s => s.id === schId);
+  if (!sch) return;
+  sch.subItems[subIdx][field] = parseFloat(value) || 0;
+  recalcAll();
+  renderSchedule();
+}
+
+function renderSchedule() {
+  const container = document.getElementById('scheduleItems');
+  if (scheduleItems.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">No schedule items yet. Add one from a BOQ line item or click below.</p>';
+    return;
+  }
+
+  container.innerHTML = scheduleItems.map(sch => {
+    const linkedItem = lineItems.find(i => i.id === sch.linkedLineId);
+    const linkedLabel = linkedItem ? `Linked to: SL ${lineItems.indexOf(linkedItem) + 1} — ${linkedItem.description || 'Untitled'}` : 'Unlinked';
+
+    return `<div class="schedule-item">
+      <h4>
+        <span>
+          <span style="font-size:0.8rem;color:var(--primary);font-weight:500">${linkedLabel}</span>
+          <br>
+          <input type="text" value="${escHtml(sch.description)}" placeholder="Schedule item description" style="border:1px solid var(--border);padding:4px 8px;border-radius:4px;width:300px;margin-top:4px" onchange="updateScheduleField(${sch.id},'description',this.value)">
+          <select style="margin-left:8px;padding:4px 8px;border:1px solid var(--border);border-radius:4px" onchange="updateScheduleField(${sch.id},'linkedLineId',parseInt(this.value)||null)">
+            <option value="">— Link to BOQ item —</option>
+            ${lineItems.map((li, idx) => `<option value="${li.id}" ${sch.linkedLineId === li.id ? 'selected' : ''}>SL ${idx+1}: ${li.description || 'Untitled'}</option>`).join('')}
+          </select>
+        </span>
+        <span>
+          <span style="font-family:var(--mono);font-weight:600;color:var(--primary);margin-right:12px">AED ${fmt(sch.total)}</span>
+          <button class="btn btn-danger btn-sm" onclick="removeScheduleItem(${sch.id})">Remove</button>
+        </span>
+      </h4>
+      ${sch.subItems.map((sub, si) => `
+        <div class="sub-item">
+          <div class="sub-item-section">
+            <h5>Material — Sub-item ${si + 1}</h5>
+            <div class="sub-fields">
+              <div class="sub-field"><label>Rate (AED)</label><input type="number" value="${sub.matRate}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'matRate',this.value)" oninput="updateScheduleSub(${sch.id},${si},'matRate',this.value)"></div>
+              <div class="sub-field"><label>Qty</label><input type="number" value="${sub.matQty}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'matQty',this.value)" oninput="updateScheduleSub(${sch.id},${si},'matQty',this.value)"></div>
+              <div class="sub-field"><label>Subtotal</label><div class="sub-total">${fmt(sub.matSubtotal)}</div></div>
+            </div>
+          </div>
+          <div class="sub-item-section">
+            <h5>Labor — Sub-item ${si + 1}</h5>
+            <div class="sub-fields">
+              <div class="sub-field"><label>Rate/hr</label><input type="number" value="${sub.laborRate}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'laborRate',this.value)" oninput="updateScheduleSub(${sch.id},${si},'laborRate',this.value)"></div>
+              <div class="sub-field"><label>Employees</label><input type="number" value="${sub.laborEmployees}" min="0" step="1" onchange="updateScheduleSub(${sch.id},${si},'laborEmployees',this.value)" oninput="updateScheduleSub(${sch.id},${si},'laborEmployees',this.value)"></div>
+              <div class="sub-field"><label>Hours</label><input type="number" value="${sub.laborHours}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'laborHours',this.value)" oninput="updateScheduleSub(${sch.id},${si},'laborHours',this.value)"></div>
+              <div class="sub-field"><label>Days</label><input type="number" value="${sub.laborDays}" min="0" step="any" onchange="updateScheduleSub(${sch.id},${si},'laborDays',this.value)" oninput="updateScheduleSub(${sch.id},${si},'laborDays',this.value)"></div>
+              <div class="sub-field"><label>Subtotal</label><div class="sub-total">${fmt(sub.laborSubtotal)}</div></div>
+            </div>
+          </div>
+          <div class="sub-item-total">
+            ${fmt(sub.total)}
+            ${sch.subItems.length > 1 ? `<br><button class="btn-icon" onclick="removeScheduleSubItem(${sch.id},${si})" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+          </div>
+        </div>
+      `).join('')}
+      <button class="btn btn-sm" onclick="addScheduleSubItem(${sch.id})" style="margin-top:8px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Sub-item</button>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// TABS
+// ============================================================
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.toggle('active', t.id === 'tab-' + name));
+}
+
+// ============================================================
+// COMPANY
+// ============================================================
+
+function changeCompany() {
+  currentCompany = document.getElementById('companySelect').value;
+  document.getElementById('defaultLaborRate').value = COMPANIES[currentCompany].laborRate;
+}
+
+function updateLaborRate() {
+  const rate = parseFloat(document.getElementById('defaultLaborRate').value) || 17;
+  COMPANIES[currentCompany].laborRate = rate;
+}
+
+// ============================================================
+// SAVE / LOAD / NEW
+// ============================================================
+
+function getEstimateData() {
+  return {
+    company: currentCompany,
+    markupRates: { ...markupRates },
+    projectInfo: {
+      supervisor: document.getElementById('supervisor').value,
+      projectDesc: document.getElementById('projectDesc').value,
+      location: document.getElementById('location').value,
+      clientName: document.getElementById('clientName').value,
+      clientEmail: document.getElementById('clientEmail').value,
+      quoteNo: document.getElementById('quoteNo').value,
+      variationNo: document.getElementById('variationNo').value,
+      projectNo: document.getElementById('projectNo').value,
+      projectDate: document.getElementById('projectDate').value,
+      duration: document.getElementById('duration').value,
+      manualDiscount: document.getElementById('manualDiscount').value
+    },
+    lineItems,
+    scheduleItems,
+    nextLineId,
+    nextScheduleId,
+    companies: COMPANIES
+  };
+}
+
+function saveEstimate() {
+  const data = getEstimateData();
+  const key = 'domus_estimate_' + (data.projectInfo.quoteNo || 'draft');
+  localStorage.setItem(key, JSON.stringify(data));
+  localStorage.setItem('domus_estimate_last', key);
+  showToast('Estimate saved');
+}
+
+function loadEstimate() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k.startsWith('domus_estimate_') && k !== 'domus_estimate_last') keys.push(k);
+  }
+  if (keys.length === 0) { showToast('No saved estimates found'); return; }
+
+  const lastKey = localStorage.getItem('domus_estimate_last');
+  const key = lastKey && localStorage.getItem(lastKey) ? lastKey : keys[0];
+
+  const data = JSON.parse(localStorage.getItem(key));
+  if (!data) { showToast('Failed to load estimate'); return; }
+
+  restoreEstimate(data);
+  showToast('Estimate loaded');
+}
+
+function restoreEstimate(data) {
+  currentCompany = data.company || 'domus';
+  document.getElementById('companySelect').value = currentCompany;
+  if (data.markupRates) markupRates = data.markupRates;
+  if (data.companies) {
+    Object.keys(data.companies).forEach(k => {
+      if (COMPANIES[k]) COMPANIES[k].laborRate = data.companies[k].laborRate;
+    });
+  }
+  const pi = data.projectInfo || {};
+  document.getElementById('supervisor').value = pi.supervisor || '';
+  document.getElementById('projectDesc').value = pi.projectDesc || '';
+  document.getElementById('location').value = pi.location || '';
+  document.getElementById('clientName').value = pi.clientName || '';
+  document.getElementById('clientEmail').value = pi.clientEmail || '';
+  document.getElementById('quoteNo').value = pi.quoteNo || '';
+  document.getElementById('variationNo').value = pi.variationNo || '';
+  document.getElementById('projectNo').value = pi.projectNo || '';
+  document.getElementById('projectDate').value = pi.projectDate || '';
+  document.getElementById('duration').value = pi.duration || '35';
+  document.getElementById('manualDiscount').value = pi.manualDiscount || '0';
+  document.getElementById('defaultLaborRate').value = COMPANIES[currentCompany].laborRate;
+
+  lineItems = data.lineItems || [];
+  scheduleItems = data.scheduleItems || [];
+  nextLineId = data.nextLineId || 1;
+  nextScheduleId = data.nextScheduleId || 1;
+
+  renderMarkupGrid();
+  renderBOQ();
+  renderSchedule();
+  recalcAll();
+}
+
+function newEstimate() {
+  if (lineItems.length > 0 && !confirm('Start a new estimate? Unsaved changes will be lost.')) return;
+  lineItems = [];
+  scheduleItems = [];
+  nextLineId = 1;
+  nextScheduleId = 1;
+  document.getElementById('supervisor').value = '';
+  document.getElementById('projectDesc').value = '';
+  document.getElementById('location').value = '';
+  document.getElementById('clientName').value = '';
+  document.getElementById('clientEmail').value = '';
+  document.getElementById('quoteNo').value = '';
+  document.getElementById('variationNo').value = '0';
+  document.getElementById('projectNo').value = '';
+  document.getElementById('projectDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('duration').value = '35';
+  document.getElementById('manualDiscount').value = '0';
+  initMarkupRates();
+  renderMarkupGrid();
+  renderBOQ();
+  renderSchedule();
+  recalcAll();
+  showToast('New estimate created');
+}
+
+// ============================================================
+// PRINT
+// ============================================================
+
+function printEstimate() {
+  const company = COMPANIES[currentCompany];
+  document.getElementById('printCompanyName').textContent = company.name;
+  document.getElementById('printCompanyRep').textContent = company.name;
+  document.getElementById('printDuration').textContent = document.getElementById('duration').value || '35';
+
+  // Print info
+  const pi = {
+    'Quote No.': document.getElementById('quoteNo').value,
+    'Variation No.': document.getElementById('variationNo').value,
+    'Project No.': document.getElementById('projectNo').value,
+    'Date': document.getElementById('projectDate').value,
+    'Client': document.getElementById('clientName').value,
+    'Email': document.getElementById('clientEmail').value,
+    'Location': document.getElementById('location').value,
+    'Supervisor': document.getElementById('supervisor').value,
+    'Description': document.getElementById('projectDesc').value,
+  };
+  document.getElementById('printInfo').innerHTML = Object.entries(pi).map(([k,v]) => `<div><strong>${k}:</strong> ${v || '—'}</div>`).join('');
+
+  // Print BOQ table
+  let tableHtml = '<thead><tr><th>SL.</th><th>Description</th><th>Unit</th><th style="text-align:right">Qty</th><th style="text-align:right">Rate (AED)</th><th style="text-align:right">Total (AED)</th></tr></thead><tbody>';
+  lineItems.forEach((item, idx) => {
+    tableHtml += `<tr><td>${idx+1}</td><td>${escHtml(item.description) || '—'}</td><td>${item.unit}</td><td class="num">${item.qty}</td><td class="num">${fmt(item.rate)}</td><td class="num">${fmt(item.total)}</td></tr>`;
+  });
+  tableHtml += '</tbody>';
+  document.getElementById('printBoqTable').innerHTML = tableHtml;
+
+  // Print summary
+  const manualDiscount = parseFloat(document.getElementById('manualDiscount').value) || 0;
+  const totalPrice = lineItems.reduce((a, i) => a + i.price, 0);
+  const discountedPrice = totalPrice * (1 - manualDiscount / 100);
+  const vat = discountedPrice * 0.05;
+  const grandTotal = discountedPrice + vat;
+
+  let sumHtml = '<table>';
+  sumHtml += `<tr><td>Subtotal</td><td>AED ${fmt(totalPrice)}</td></tr>`;
+  if (manualDiscount > 0) {
+    sumHtml += `<tr><td>Discount (${manualDiscount}%)</td><td>- AED ${fmt(totalPrice - discountedPrice)}</td></tr>`;
+    sumHtml += `<tr><td>After Discount</td><td>AED ${fmt(discountedPrice)}</td></tr>`;
+  }
+  sumHtml += `<tr><td>VAT (5%)</td><td>AED ${fmt(vat)}</td></tr>`;
+  sumHtml += `<tr class="grand"><td><strong>Total (Incl. VAT)</strong></td><td><strong>AED ${fmt(grandTotal)}</strong></td></tr>`;
+  sumHtml += '</table>';
+  document.getElementById('printSummary').innerHTML = sumHtml;
+
+  window.print();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+
+function init() {
+  initMarkupRates();
+  document.getElementById('projectDate').value = new Date().toISOString().split('T')[0];
+  renderMarkupGrid();
+  renderDiscountTiers(0);
+  renderSchedule();
+
+  // Try loading last estimate
+  const lastKey = localStorage.getItem('domus_estimate_last');
+  if (lastKey && localStorage.getItem(lastKey)) {
+    try {
+      const data = JSON.parse(localStorage.getItem(lastKey));
+      restoreEstimate(data);
+      return;
+    } catch(e) {}
+  }
+
+  // Add a default line item
+  addLineItem();
+}
+
+init();
+</script>
+</body>
+</html>
