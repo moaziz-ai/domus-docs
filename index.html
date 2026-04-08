@@ -322,12 +322,17 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
    BOQ TABLE
    ============================================================ */
 .boq-wrapper { overflow-x: auto; }
-.boq-table { width: 100%; border-collapse: collapse; }
+.boq-table { 
+  width: 100%; 
+  min-width: 1200px; 
+  border-collapse: collapse;
+  table-layout: fixed;
+}
 .boq-table th {
   background: var(--gray-50); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.05em; color: var(--text-tertiary); padding: 10px 12px; text-align: left;
+  letter-spacing: 0.05em; color: var(--text-tertiary); padding: 10px 8px; text-align: left;
   border-bottom: 1px solid var(--border); position: sticky; top: 52px; z-index: 10;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px); white-space: nowrap; overflow: hidden;
 }
 [data-theme="dark"] .boq-table th { background: rgba(20,20,22,0.9); }
 .boq-table th.num, .boq-table td.num { text-align: right; }
@@ -341,12 +346,26 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 .section-row td:first-child { border-left: 3px solid var(--primary-500); }
 .section-row .section-subtotal { font-family: var(--mono); font-weight: 600; color: var(--primary-600); font-size: 0.85rem; }
 
-.boq-row td { padding: 4px 8px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.boq-row td { 
+  padding: 6px 4px; 
+  border-bottom: 1px solid var(--border-light); 
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .boq-row { transition: background var(--duration) var(--ease); }
 .boq-row:hover { background: var(--primary-25); }
 .boq-row:nth-child(even):not(:hover) { background: var(--surface-secondary); }
 .boq-row.zero-cost { background: var(--warning-50) !important; }
 .boq-row.zero-cost:hover { background: var(--warning-100) !important; }
+
+/* Description column should allow wrapping */
+.boq-row td:nth-child(4) {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 250px;
+}
 .boq-row.selected { background: var(--primary-50) !important; }
 
 .boq-row td input, .boq-row td select {
@@ -896,18 +915,18 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
           <table class="boq-table">
             <thead>
               <tr>
-                <th style="width:24px" class="no-print"></th>
-                <th style="width:24px" class="no-print"></th>
-                <th style="width:60px">No.</th>
-                <th style="min-width:200px">Description</th>
+                <th style="width:30px" class="no-print"></th>
+                <th style="width:30px" class="no-print"></th>
+                <th style="width:50px">No.</th>
+                <th style="width:250px">Description</th>
                 <th style="width:70px">Unit</th>
-                <th style="width:80px" class="num">Qty</th>
-                <th style="width:100px" class="num">Rate (AED)</th>
-                <th style="width:110px" class="num">Total (AED)</th>
-                <th style="width:120px" class="no-print">Type</th>
-                <th style="width:65px" class="num no-print">Markup</th>
-                <th style="width:95px" class="num no-print">Cost</th>
-                <th style="width:50px" class="no-print"></th>
+                <th style="width:70px" class="num">Qty</th>
+                <th style="width:90px" class="num">Rate (AED)</th>
+                <th style="width:100px" class="num">Total (AED)</th>
+                <th style="width:110px" class="no-print">Type</th>
+                <th style="width:70px" class="num no-print">Markup</th>
+                <th style="width:80px" class="num no-print">Cost</th>
+                <th style="width:60px" class="no-print"></th>
               </tr>
             </thead>
             <tbody id="boqBody"></tbody>
