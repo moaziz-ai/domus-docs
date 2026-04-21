@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estimate Calculator - Project Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#fff;--surface:#f9fafb;--border:#e5e7eb;--text:#111827;--text-secondary:#6b7280;--primary:#2563eb;--primary-light:#eff6ff;--accent:#059669;--accent-light:#ecfdf5;--warning:#d97706;--warning-light:#fffbeb;--code-bg:#f3f4f6;--shadow:0 1px 3px rgba(0,0,0,.1);--radius:8px}
+body{font-family:'Inter',sans-serif;color:var(--text);background:var(--bg);line-height:1.7;font-size:15px}
+a{color:var(--primary);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Layout */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:260px;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;border-right:1px solid var(--border);padding:24px 20px;background:var(--surface);z-index:10}
+.sidebar h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:16px}
+.sidebar ul{list-style:none}
+.sidebar li{margin-bottom:2px}
+.sidebar a{display:block;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:500;color:var(--text-secondary);transition:all .15s}
+.sidebar a:hover{background:var(--border);color:var(--text);text-decoration:none}
+.sidebar a.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.sidebar .sub{padding-left:16px}
+.sidebar .sub a{font-size:12px;font-weight:400}
+
+.main{margin-left:260px;max-width:820px;padding:48px 48px 96px}
+
+/* Meta bar */
+.meta{display:flex;flex-wrap:wrap;gap:24px;padding:20px 24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:40px}
+.meta-item{display:flex;flex-direction:column;gap:2px}
+.meta-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary)}
+.meta-value{font-size:14px;font-weight:500}
+
+/* Headings */
+h1{font-size:28px;font-weight:700;margin-bottom:8px;letter-spacing:-.02em}
+h1+p{color:var(--text-secondary);font-size:15px;margin-bottom:40px}
+h2{font-size:20px;font-weight:700;margin:48px 0 16px;padding-bottom:8px;border-bottom:2px solid var(--border);letter-spacing:-.01em}
+h3{font-size:16px;font-weight:600;margin:32px 0 12px;color:var(--text)}
+h4{font-size:14px;font-weight:600;margin:24px 0 8px;color:var(--text)}
+
+/* Lists */
+ul,ol{padding-left:24px;margin-bottom:16px}
+li{margin-bottom:6px}
+li strong{font-weight:600}
+p{margin-bottom:14px}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px}
+th{background:var(--surface);font-weight:600;text-align:left;padding:10px 14px;border:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--text-secondary)}
+td{padding:10px 14px;border:1px solid var(--border)}
+tr:nth-child(even) td{background:var(--surface)}
+
+/* Code */
+code{font-family:'JetBrains Mono',monospace;background:var(--code-bg);padding:2px 6px;border-radius:4px;font-size:13px}
+pre{background:var(--code-bg);padding:16px 20px;border-radius:var(--radius);overflow-x:auto;margin:16px 0 24px;font-size:13px;line-height:1.6}
+pre code{background:none;padding:0}
+
+/* Callout */
+.callout{padding:16px 20px;border-radius:var(--radius);margin:20px 0;border-left:4px solid}
+.callout.info{background:var(--primary-light);border-color:var(--primary)}
+.callout.warning{background:var(--warning-light);border-color:var(--warning)}
+.callout.success{background:var(--accent-light);border-color:var(--accent)}
+.callout strong{display:block;margin-bottom:4px;font-size:13px;text-transform:uppercase;letter-spacing:.03em}
+
+/* Flow */
+.flow{display:flex;flex-direction:column;gap:0;margin:24px 0}
+.flow-step{display:flex;align-items:flex-start;gap:16px;position:relative;padding-bottom:24px}
+.flow-step:last-child{padding-bottom:0}
+.flow-step:not(:last-child)::after{content:'';position:absolute;left:17px;top:36px;bottom:0;width:2px;background:var(--border)}
+.flow-num{width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.flow-text{padding-top:6px;font-size:14px;line-height:1.6}
+
+/* Badge */
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.badge.backlog{background:#fef3c7;color:#92400e}
+.badge.todo{background:#dbeafe;color:#1e40af}
+
+/* Feature list */
+.features{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin:16px 0 24px}
+.features li{list-style:none;padding-left:20px;position:relative;font-size:14px}
+.features li::before{content:'';position:absolute;left:0;top:8px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+/* Responsive */
+@media(max-width:900px){
+.sidebar{display:none}
+.main{margin-left:0;padding:24px 20px 64px}
+.features{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+<h2>Project Brief</h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#context">Business Context</a></li>
+<li><a href="#excel">How the Excel Works</a>
+<ul class="sub">
+<li><a href="#sheet1">Sheet 1: Markup Calculator</a></li>
+<li><a href="#sheet2">Sheet 2: Project Estimation</a></li>
+<li><a href="#sheet3">Sheet 3: Item Schedule</a></li>
+<li><a href="#flow">How It All Connects</a></li>
+</ul>
+</li>
+<li><a href="#prototype">V2 Prototype</a></li>
+<li><a href="#next">What Needs to Happen</a></li>
+<li><a href="#tickets">Linear Tickets</a></li>
+<li><a href="#contacts">Key Contacts</a></li>
+<li><a href="#history">Email History</a></li>
+<li><a href="#architecture">Architecture Notes</a></li>
+</ul>
+</nav>
+
+<main class="main">
+<h1>Estimate Calculator</h1>
+<p>Project brief for Owais - everything you need to understand the project, the Excel logic, and what has been built so far.</p>
+
+<div class="meta">
+<div class="meta-item"><span class="meta-label">Date</span><span class="meta-value">April 21, 2026</span></div>
+<div class="meta-item"><span class="meta-label">DRI</span><span class="meta-value">Owais</span></div>
+<div class="meta-item"><span class="meta-label">Project Owner</span><span class="meta-value">Mo Aziz</span></div>
+<div class="meta-item"><span class="meta-label">Company</span><span class="meta-value">Domus Interior Contracting L.L.C</span></div>
+<div class="meta-item"><span class="meta-label">Group</span><span class="meta-value">Exceed (under Axeed)</span></div>
+</div>
+
+<h2 id="overview">What This Is</h2>
+<p>Domus (and all Exceed companies - NG, Phoenix, Nomos, Telos) currently use an Excel spreadsheet (V3) to build project cost estimates. The goal is to digitize this into a proper web application that replaces the Excel workflow entirely.</p>
+<p>This is an <strong>internal operations tool</strong> - not customer-facing. The people using it daily are quantity surveyors (like Anthony at Domus) and project managers across the Exceed group.</p>
+
+<h2 id="context">Business Context</h2>
+<ul>
+<li><strong>Current state:</strong> Manual Excel-based estimates (V3 template), used across all Exceed companies</li>
+<li><strong>Problem:</strong> Excel is error-prone, no version control, no multi-user collaboration, no analytics</li>
+<li><strong>Key person (business side):</strong> Ahmed Sallam - did the SOPs, understands the business journey (took estimate approval rates from 60% to 95%)</li>
+<li><strong>Key person (data/template):</strong> Muhasin (mm@axeed.com) - provided the original Excel template, reviewed the V2 prototype</li>
+<li><strong>QS (daily user):</strong> Anthony - Domus quantity surveyor, prepares estimates daily</li>
+<li><strong>Final approver:</strong> Abdullah (CEO/founder of Exceed group)</li>
+<li><strong>Default labor rate:</strong> 17 AED/hr (Domus has ~500 people, avg salary ~2,900/month)</li>
+</ul>
+
+<h2 id="excel">How the Excel Works (Plain English)</h2>
+<p>The Excel has <strong>3 sheets</strong>. Here is exactly what each one does.</p>
+
+<h3 id="sheet1">Sheet 1: Project Markup Calculator</h3>
+<p>This is the pricing brain. It has three tables on one sheet.</p>
+
+<h4>Table A - Trade Markup Rates (17 categories)</h4>
+<p>Every line item in an estimate belongs to one trade. Each trade has a fixed markup %:</p>
+<table>
+<thead><tr><th>Trade</th><th>Markup</th></tr></thead>
+<tbody>
+<tr><td>Base Works</td><td>40%</td></tr>
+<tr><td>Furniture</td><td>40%</td></tr>
+<tr><td>HVAC</td><td>35%</td></tr>
+<tr><td>MEP</td><td>35%</td></tr>
+<tr><td>Marble</td><td>35%</td></tr>
+<tr><td>Joinery</td><td>35%</td></tr>
+<tr><td>Waterproofing</td><td>35%</td></tr>
+<tr><td>Light Carpentry</td><td>30%</td></tr>
+<tr><td>Steel Works</td><td>30%</td></tr>
+<tr><td>Aluminium Works</td><td>30%</td></tr>
+<tr><td>Glass</td><td>30%</td></tr>
+<tr><td>Painting</td><td>25%</td></tr>
+<tr><td>Civil Works</td><td>25%</td></tr>
+<tr><td>Masonry</td><td>25%</td></tr>
+<tr><td>Subcontracted</td><td>15%</td></tr>
+<tr><td>Preliminary</td><td>10%</td></tr>
+<tr><td>Demolition</td><td>10%</td></tr>
+</tbody>
+</table>
+
+<h4>Table B - Value Discount Tiers</h4>
+<p>The bigger the project, the more discount on the markup. This discount reduces the markup %, <strong>NOT</strong> the base cost.</p>
+<table>
+<thead><tr><th>Total Project Cost (AED)</th><th>Discount on Markup</th></tr></thead>
+<tbody>
+<tr><td>10,000+</td><td>5%</td></tr>
+<tr><td>25,000+</td><td>10%</td></tr>
+<tr><td>50,000+</td><td>20%</td></tr>
+<tr><td>100,000+</td><td>30%</td></tr>
+<tr><td>500,000+</td><td>40%</td></tr>
+<tr><td>1,000,000+</td><td>50%</td></tr>
+<tr><td>2,500,000+</td><td>60%</td></tr>
+</tbody>
+</table>
+
+<div class="callout info">
+<strong>Example</strong>
+A 100,000 AED project gets 30% off the markup. So a Joinery item (35% markup) would effectively have: <code>35% x (1 - 30%) = 24.5%</code> markup.
+</div>
+
+<h4>Table C - Project Summary (auto-calculated)</h4>
+<ul>
+<li><strong>Domus Cost</strong> = total cost of all non-subcontracted line items (pulled from Sheet 2)</li>
+<li><strong>Subcontractor Cost</strong> = total cost of all subcontracted line items (pulled from Sheet 2)</li>
+<li><strong>Total Project Cost</strong> = Domus Cost + Subcontractor Cost</li>
+<li><strong>Markup Discount</strong> = looked up from the Value Discount table based on Total Project Cost</li>
+<li><strong>Final Markup %</strong> = (Total Quoted Price / Total Cost) - 1 (this is a result, not an input)</li>
+<li><strong>Total Project Price (Before VAT)</strong> = Total Project Cost x (1 + Final Markup %)</li>
+</ul>
+<p>There is also an optional manual discount row that can be applied on top.</p>
+
+<h3 id="sheet2">Sheet 2: Project Estimation (the main BOQ)</h3>
+<p>This is where the actual estimate gets built. It is the biggest sheet.</p>
+
+<h4>Header (rows 2-8)</h4>
+<p>Project info: supervisor, project name, location, client, email, quote number, date.</p>
+
+<h4>Line Items (rows 13-25)</h4>
+<p>Each row is one line item in the estimate. Each line item has:</p>
+<ul>
+<li><strong>SL. NO.</strong> - item number (1, 1.1, 1.2, etc.)</li>
+<li><strong>DESCRIPTION</strong> - what the work is</li>
+<li><strong>UNIT</strong> - unit of measurement (M2, Item, etc.)</li>
+<li><strong>QTY</strong> - quantity</li>
+<li><strong>TYPE</strong> - which trade category (dropdown from the 17 trades)</li>
+<li><strong>MARKUP</strong> - auto-filled via VLOOKUP from Sheet 1 based on trade type</li>
+</ul>
+
+<h4>Sub-items (up to 3 per line item)</h4>
+<p>Each line item can have up to 3 sub-items. Each sub-item breaks down into:</p>
+<ul>
+<li><strong>Material:</strong> Rate x Quantity</li>
+<li><strong>Labour:</strong> Rate x Employees x Hours x Days</li>
+<li><strong>Total</strong> = Material + Labour</li>
+<li><strong>Unit Total</strong> = Total x QTY (from the main line item)</li>
+</ul>
+<pre><code>Sub-item Total = (Material Rate x Material Qty) + (Labour Rate x Employees x Hours x Days)</code></pre>
+<p><strong>Grand Total</strong> for a line item = Sub-item 1 Total + Sub-item 2 Total + Sub-item 3 Total</p>
+
+<h4>The RATE and client-facing TOTAL columns</h4>
+<p>This is the key pricing formula:</p>
+<pre><code>RATE = Grand Total Cost x (1 + (Trade Markup x (1 - Value Discount) - Manual Discount))
+TOTAL = QTY x RATE</code></pre>
+<p>The rate the client sees = the internal cost, marked up by the trade's percentage, reduced by the value discount tier, minus any manual discount.</p>
+
+<h4>Summary Rows</h4>
+<ul>
+<li><strong>Total Domus Cost</strong> = sum of all unit totals EXCEPT subcontracted items</li>
+<li><strong>Total Subcontracted Cost</strong> = sum of unit totals WHERE type = "Subcontracted"</li>
+<li><strong>Total Cost</strong> = sum of ALL unit totals</li>
+<li><strong>Total (client-facing)</strong> = sum of marked-up prices</li>
+<li><strong>5% VAT</strong> = Total x 0.05</li>
+<li><strong>Total Inclusive of VAT</strong> = Total + VAT</li>
+</ul>
+
+<h3 id="sheet3">Sheet 3: Item Schedule</h3>
+<p>A simpler version used for detailed material/labour breakdowns on specific items (like a door or a fixture). Same cost structure but <strong>without the markup layer</strong>.</p>
+<p>Line items each have:</p>
+<ul>
+<li>Description</li>
+<li>Material: Rate x Unit x Quantity</li>
+<li>Labour: Rate x Employees x Hours x Days</li>
+<li>Total = (Material Rate x Qty) + (Labour Rate x Employees x Hours x Days)</li>
+</ul>
+<p>At the bottom:</p>
+<ul>
+<li><strong>Total Domus Cost</strong> = Total - Subcontracted items</li>
+<li><strong>Total Subcontracted Cost</strong> = items marked as "Subcontracted"</li>
+<li><strong>Grand Total</strong> = sum of all items</li>
+</ul>
+
+<h3 id="flow">How It All Connects</h3>
+<div class="flow">
+<div class="flow-step"><div class="flow-num">1</div><div class="flow-text">User fills in line items on Sheet 2 (description, qty, trade type, sub-item costs)</div></div>
+<div class="flow-step"><div class="flow-num">2</div><div class="flow-text">Each line item's trade type auto-looks-up the markup % from Sheet 1</div></div>
+<div class="flow-step"><div class="flow-num">3</div><div class="flow-text">Sub-item costs (material + labour) are totalled per line item</div></div>
+<div class="flow-step"><div class="flow-num">4</div><div class="flow-text">The client-facing RATE applies: cost + markup - value discount - manual discount</div></div>
+<div class="flow-step"><div class="flow-num">5</div><div class="flow-text">Sheet 1 auto-calculates the total project cost and determines the value discount tier</div></div>
+<div class="flow-step"><div class="flow-num">6</div><div class="flow-text">The value discount feeds back into every line item's rate calculation (circular dependency resolved by Excel's iterative calculation)</div></div>
+<div class="flow-step"><div class="flow-num">7</div><div class="flow-text">Final output: client sees RATE and TOTAL columns. Internal team sees full cost breakdown.</div></div>
+</div>
+
+<div class="callout warning">
+<strong>Circular Reference</strong>
+The value discount is determined by the TOTAL project cost, which itself depends on the markup, which depends on the discount. This creates a circular reference that Excel resolves iteratively. The web app needs to handle this too (loop until stable or solve algebraically).
+</div>
+
+<h2 id="prototype">V2 Prototype (What Has Been Built)</h2>
+<p>A working V2 prototype exists as a standalone HTML/JS application (2,600+ lines, single file).</p>
+<p><strong>Live demo:</strong> <a href="https://moaziz-ai.github.io/domus-docs/" target="_blank">moaziz-ai.github.io/domus-docs</a><br>
+<strong>Source:</strong> <a href="https://github.com/moaziz-ai/domus-docs" target="_blank">github.com/moaziz-ai/domus-docs</a></p>
+
+<h4>V2 Features</h4>
+<ul class="features">
+<li>All 17 trade categories with correct markup rates</li>
+<li>Value discount tiers applied to markup</li>
+<li>Weighted average markup calculation</li>
+<li>Sub-item breakdown (material + labor)</li>
+<li>Multi-company support</li>
+<li>Summary dashboard</li>
+<li>Templates library</li>
+<li>Estimate versioning with history</li>
+<li>Role-based access (Admin / Estimator / Viewer)</li>
+<li>Excel export via SheetJS</li>
+<li>Analytics dashboard</li>
+<li>Undo/redo</li>
+</ul>
+
+<div class="callout warning">
+<strong>Known Issues (from Muhasin's feedback, April 9)</strong>
+Some individual line items do not add up properly to the total when additional items are included. Overall figures appear correct, but per-line-item math needs a pass. Calculation logic needs to be QA'd against real Excel scenarios.
+</div>
+
+<h4>Stack</h4>
+<ul>
+<li>Standalone HTML/JS (no build system, no framework)</li>
+<li>GitHub Pages for hosting</li>
+<li>SheetJS for Excel export</li>
+<li>Supabase project ("domus-estimator") in Axeed org - exists but not yet wired up</li>
+</ul>
+
+<h2 id="next">What Needs to Happen Next</h2>
+<h4>Immediate (V2 fixes)</h4>
+<ol>
+<li>Fix the line-item calculation bug Muhasin flagged</li>
+<li>QA all calculation logic against the original Excel template (compare outputs side by side)</li>
+<li>Validate with Muhasin and Anthony using real estimate scenarios</li>
+</ol>
+<h4>Phase 2 (Production)</h4>
+<ol>
+<li>Supabase integration for persistence and multi-user access</li>
+<li>Authentication (tie into Axeed's systems)</li>
+<li>Multi-company support with real data (Domus, NG, Phoenix, Nomos, Telos)</li>
+<li>API layer for future integrations</li>
+</ol>
+
+<h2 id="tickets">Linear Tickets</h2>
+<p>10 tickets exist in the Axeed Linear workspace (AXE-306 through AXE-315):</p>
+<table>
+<thead><tr><th>Ticket</th><th>Title</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>AXE-306</td><td>Reverse-engineer Excel estimate calculator logic</td><td><span class="badge backlog">Backlog</span></td></tr>
+<tr><td>AXE-307</td><td>Build web BOQ builder with sub-item cost breakdown</td><td><span class="badge backlog">Backlog</span></td></tr>
+<tr><td>AXE-308</td><td>Implement markup engine and value discount tiers</td><td><span class="badge backlog">Backlog</span></td></tr>
+<tr><td>AXE-309</td><td>Design client-facing print and PDF estimate output</td><td><span class="badge backlog">Backlog</span></td></tr>
+<tr><td>AXE-310</td><td>Add reusable item templates and saved schedules</td><td><span class="badge backlog">Backlog</span></td></tr>
+<tr><td>AXE-311</td><td>Add estimate versioning and history</td><td><span class="badge backlog">Backlog</span></td></tr>
+<tr><td>AXE-312</td><td>Add exports and import flows</td><td><span class="badge backlog">Backlog</span></td></tr>
+<tr><td>AXE-313</td><td>Upgrade UX to Ramp-quality estimator workspace</td><td><span class="badge backlog">Backlog</span></td></tr>
+<tr><td>AXE-314</td><td>Prepare backend-ready data layer for future Axeed Supabase sync</td><td><span class="badge backlog">Backlog</span></td></tr>
+<tr><td>AXE-315</td><td>QA estimate logic against real Excel scenarios</td><td><span class="badge backlog">Backlog</span></td></tr>
+</tbody>
+</table>
+
+<h2 id="contacts">Key Contacts</h2>
+<table>
+<thead><tr><th>Person</th><th>Email</th><th>Role</th></tr></thead>
+<tbody>
+<tr><td>Mo Aziz</td><td>moz@axeedloyalty.com</td><td>Project owner</td></tr>
+<tr><td>Muhasin</td><td>mm@axeed.com</td><td>Provided Excel template, reviewed V2, key stakeholder</td></tr>
+<tr><td>Abdullah</td><td>am@axeed.com</td><td>CEO/founder, final approver</td></tr>
+<tr><td>Ahmed Sallam</td><td>asa@axeed.com</td><td>SOP author, business process expert</td></tr>
+<tr><td>Anthony</td><td>(via Domus)</td><td>QS, daily user of the estimate tool</td></tr>
+</tbody>
+</table>
+
+<h2 id="history">Email History</h2>
+<ul>
+<li><strong>March 31:</strong> Muhasin sent the Domus Project Estimate V3.xlsx template per Mo's request after a meeting with Abdullah, Muhasin, Ibrahim, and others where the estimate process was walked through.</li>
+<li><strong>April 8:</strong> Mo sent Muhasin a demo request email with the live prototype link and a list of current features. Asked for a 30-45 min session to understand the user journey.</li>
+<li><strong>April 9:</strong> Muhasin replied positively - called the UI "impressive and very intuitive." Flagged a calculation bug (line items not adding up to total when additional items are included). Suggested coordinating a meeting with Abdullah present, possibly combined with the AXD Loyalty meeting.</li>
+</ul>
+<div class="callout info">
+<strong>Current Status</strong>
+Meeting with Muhasin + Abdullah has not yet been scheduled.
+</div>
+
+<h2 id="architecture">Architecture Notes</h2>
+<ul>
+<li>Internal ops tools are separate from Shopify (not built on Shopify)</li>
+<li>V1 = manual/simple approaches. V2 = automated/API-integrated</li>
+<li>Prototype should stay light mode (not dark mode for internal ops)</li>
+</ul>
+
+</main>
+</div>
+
+<script>
+// Sidebar scroll highlight
+const links=document.querySelectorAll('.sidebar a[href^="#"]');
+const sections=[];
+links.forEach(l=>{const t=document.querySelector(l.getAttribute('href'));if(t)sections.push({link:l,target:t})});
+function updateActive(){
+let current=null;
+sections.forEach(s=>{if(s.target.getBoundingClientRect().top<=120)current=s});
+links.forEach(l=>l.classList.remove('active'));
+if(current)current.link.classList.add('active');
+}
+window.addEventListener('scroll',updateActive);
+updateActive();
+</script>
+</body>
+</html>
